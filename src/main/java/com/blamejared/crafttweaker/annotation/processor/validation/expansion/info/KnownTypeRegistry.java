@@ -1,7 +1,7 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.info;
 
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.IHasPostCreationCall;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 import org.openzen.zencode.java.ZenCodeType;
 import org.reflections.Reflections;
 

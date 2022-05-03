@@ -16,7 +16,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.member.sta
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.util.annotations.AnnotationMirrorUtil;
 import com.blamejared.crafttweaker.api.annotation.BracketResolver;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 import org.openzen.zencode.java.ZenCodeType;
 
 import javax.annotation.Nullable;

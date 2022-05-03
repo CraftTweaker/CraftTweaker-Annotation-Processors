@@ -25,8 +25,8 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.page.EnumT
 import com.blamejared.crafttweaker.annotation.processor.document.page.page.TypePage;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.TypePageTypeInfo;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.BracketEnum;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.BracketEnum;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Element;

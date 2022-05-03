@@ -1,4 +1,4 @@
-package com.blamejared.crafttweaker.crafttweaker_annotations.annotations;
+package com.blamejared.crafttweaker_annotations.annotations;
 
 import java.lang.annotation.*;
 

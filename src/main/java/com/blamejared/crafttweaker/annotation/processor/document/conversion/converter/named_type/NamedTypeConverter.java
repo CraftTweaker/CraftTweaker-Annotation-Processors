@@ -19,7 +19,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.page.Docum
 import com.blamejared.crafttweaker.annotation.processor.document.page.page.EnumTypePage;
 import com.blamejared.crafttweaker.annotation.processor.document.page.page.TypePage;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.BracketEnum;
+import com.blamejared.crafttweaker_annotations.annotations.BracketEnum;
 import org.openzen.zencode.java.ZenCodeType;
 
 import javax.annotation.Nonnull;

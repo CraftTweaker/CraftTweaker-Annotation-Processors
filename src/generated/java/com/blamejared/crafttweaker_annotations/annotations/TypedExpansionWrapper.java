@@ -1,10 +1,19 @@
-package com.blamejared.crafttweaker.crafttweaker_annotations.annotations;
+package com.blamejared.crafttweaker_annotations.annotations;
 import com.blamejared.crafttweaker_annotations.annotations.TypedExpansion;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-
+import java.util.ArrayList;
+import java.util.List;
 import io.toolisticon.aptk.tools.AnnotationUtils;
 import io.toolisticon.aptk.tools.TypeMirrorWrapper;
 import io.toolisticon.aptk.tools.TypeUtils;

@@ -6,7 +6,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.conversion.elem
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.mods.KnownModList;
 import com.blamejared.crafttweaker.annotation.processor.document.file.DocsJsonWriter;
 import com.blamejared.crafttweaker.annotation.processor.document.file.PageWriter;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.Document;
+import com.blamejared.crafttweaker_annotations.annotations.Document;
 import com.google.auto.service.AutoService;
 import com.sun.source.util.Trees;
 import org.reflections.Reflections;

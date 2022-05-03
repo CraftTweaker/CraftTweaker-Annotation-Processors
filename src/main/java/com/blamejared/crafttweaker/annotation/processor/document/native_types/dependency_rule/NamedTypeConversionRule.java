@@ -4,7 +4,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.info.TypeN
 import com.blamejared.crafttweaker.annotation.processor.document.page.info.TypePageInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.TypePageTypeInfo;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.Document;
+import com.blamejared.crafttweaker_annotations.annotations.Document;
 import org.jetbrains.annotations.NotNull;
 import org.openzen.zencode.java.ZenCodeType;
 import org.reflections.Reflections;

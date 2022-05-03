@@ -7,7 +7,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.info.Docum
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.header.examples.Example;
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.header.examples.ExampleData;
 import com.blamejared.crafttweaker.annotation.processor.document.page.page.DocumentationPage;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.Document;
+import com.blamejared.crafttweaker_annotations.annotations.Document;
 
 import javax.lang.model.element.TypeElement;
 

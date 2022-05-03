@@ -1,8 +1,8 @@
 package com.blamejared.crafttweaker.annotation.processor.document.conversion.element;
 
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.Document;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeTypeRegistration;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.TypedExpansion;
+import com.blamejared.crafttweaker_annotations.annotations.Document;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.TypedExpansion;
 import org.openzen.zencode.java.ZenCodeType;
 
 import javax.annotation.processing.ProcessingEnvironment;

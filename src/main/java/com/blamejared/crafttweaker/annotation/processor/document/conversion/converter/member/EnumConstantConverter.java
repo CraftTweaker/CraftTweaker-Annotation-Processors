@@ -4,7 +4,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.conversion.conv
 import com.blamejared.crafttweaker.annotation.processor.document.page.comment.DocumentationComment;
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.enum_constant.DocumentedEnumConstants;
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.enum_constant.EnumConstant;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.BracketEnum;
+import com.blamejared.crafttweaker_annotations.annotations.BracketEnum;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;

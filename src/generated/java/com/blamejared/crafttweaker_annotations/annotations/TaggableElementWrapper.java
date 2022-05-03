@@ -1,16 +1,28 @@
-package com.blamejared.crafttweaker.crafttweaker_annotations.annotations;
-import com.blamejared.crafttweaker_annotations.annotations.BracketEnum;
+package com.blamejared.crafttweaker_annotations.annotations;
+import com.blamejared.crafttweaker_annotations.annotations.TaggableElement;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
+import java.util.List;
 import io.toolisticon.aptk.tools.AnnotationUtils;
+import io.toolisticon.aptk.tools.TypeMirrorWrapper;
+import io.toolisticon.aptk.tools.TypeUtils;
 
 
 /**
- * Wrapper class to read attribute values from Annotation BracketEnum.
+ * Wrapper class to read attribute values from Annotation TaggableElement.
  */
-public class BracketEnumWrapper {
+public class TaggableElementWrapper {
 
     private final Element annotatedElement;
     private final AnnotationMirror annotationMirror;
@@ -20,9 +32,9 @@ public class BracketEnumWrapper {
      * Used to read annotation from Element.
      * @param annotatedElement the annotated Element to annotated with this wrapper annotation
      */
-    private BracketEnumWrapper (Element annotatedElement) {
+    private TaggableElementWrapper (Element annotatedElement) {
         this.annotatedElement = annotatedElement;
-        this.annotationMirror = AnnotationUtils.getAnnotationMirror(annotatedElement, BracketEnum.class);
+        this.annotationMirror = AnnotationUtils.getAnnotationMirror(annotatedElement, TaggableElement.class);
     }
 
     /**
@@ -31,7 +43,7 @@ public class BracketEnumWrapper {
      * @param element the element related with the passed annotationMirror
      * @param annotationMirror the AnnotationMirror to wrap
      */
-    private BracketEnumWrapper (Element element, AnnotationMirror annotationMirror) {
+    private TaggableElementWrapper (Element element, AnnotationMirror annotationMirror) {
         this.annotatedElement = element;
         this.annotationMirror = annotationMirror;
     }
@@ -51,7 +63,7 @@ public class BracketEnumWrapper {
      }
 
     /**
-     * Gets the BracketEnum.value from wrapped annotation.
+     * Gets the TaggableElement.value from wrapped annotation.
      * @return the attribute value
      */
     public String value() {
@@ -63,12 +75,12 @@ public class BracketEnumWrapper {
 
 
     /**
-     * Checks if passed element is annotated with this wrapper annotation type : BracketEnum
+     * Checks if passed element is annotated with this wrapper annotation type : TaggableElement
      * @param element The element to check for wrapped annotation type
-     * @return true, if passed element is annotated with BracketEnum annotation, otherwise false
+     * @return true, if passed element is annotated with TaggableElement annotation, otherwise false
      */
     public static boolean isAnnotated(Element element) {
-        return element != null && element.getAnnotation(BracketEnum.class) != null;
+        return element != null && element.getAnnotation(TaggableElement.class) != null;
     }
 
      /**
@@ -76,8 +88,8 @@ public class BracketEnumWrapper {
       * @param element The element to read the annotations from
       * @return The wrapped AnnotationMirror if Element is annotated with this wrappers annotation type, otherwise null.
       */
-    public static BracketEnumWrapper wrap(Element element) {
-        return isAnnotated(element) ? new BracketEnumWrapper(element) : null;
+    public static TaggableElementWrapper wrap(Element element) {
+        return isAnnotated(element) ? new TaggableElementWrapper(element) : null;
     }
 
     /**
@@ -86,8 +98,8 @@ public class BracketEnumWrapper {
      * @param annotationMirror The element annotated with the annotation to wrap
      * @return The wrapper instance
      */
-    public static BracketEnumWrapper wrap(AnnotationMirror annotationMirror) {
-        return new BracketEnumWrapper(null, annotationMirror);
+    public static TaggableElementWrapper wrap(AnnotationMirror annotationMirror) {
+        return new TaggableElementWrapper(null, annotationMirror);
     }
 
    /**
@@ -97,8 +109,8 @@ public class BracketEnumWrapper {
      * @param annotationMirror The AnnotationMirror to wrap
      * @return The wrapper instance
      */
-    public static BracketEnumWrapper wrap(Element element, AnnotationMirror annotationMirror) {
-        return new BracketEnumWrapper(element, annotationMirror);
+    public static TaggableElementWrapper wrap(Element element, AnnotationMirror annotationMirror) {
+        return new TaggableElementWrapper(element, annotationMirror);
     }
 
 }

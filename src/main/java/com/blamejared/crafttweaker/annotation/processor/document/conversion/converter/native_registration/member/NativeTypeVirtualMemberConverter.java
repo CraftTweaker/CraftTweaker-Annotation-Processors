@@ -18,8 +18,8 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.member.vir
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.virtual_member.DocumentedVirtualMembers;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.DependencyContainer;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeConstructor;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.NativeConstructor;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.element.TypeElement;

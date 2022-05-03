@@ -3,7 +3,7 @@ package com.blamejared.crafttweaker.annotation.processor.validation.expansion.na
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.element.ClassTypeConverter;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.KnownTypeRegistry;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConversionRule;
-import com.blamejared.crafttweaker.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.TypeElement;
