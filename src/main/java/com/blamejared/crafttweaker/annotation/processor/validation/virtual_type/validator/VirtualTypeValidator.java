@@ -10,6 +10,7 @@ import com.blamejared.crafttweaker.annotation.processor.validation.virtual_type.
 import io.toolisticon.aptk.tools.ElementUtils;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +38,7 @@ public class VirtualTypeValidator implements IHasPostCreationCall {
     
     private boolean isTypeElement(Element element) {
     
-        return ElementUtils.CheckKindOfElement.isClass(element) || ElementUtils.CheckKindOfElement.isInterface(element);
+        return ElementUtils.CheckKindOfElement.isClass(element) || ElementUtils.CheckKindOfElement.isEnum(element) || ElementUtils.CheckKindOfElement.isOfKind(element, ElementKind.RECORD) || ElementUtils.CheckKindOfElement.isInterface(element);
     }
     
     private void validate(TypeElement element) {
