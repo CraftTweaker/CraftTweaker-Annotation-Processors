@@ -2,10 +2,14 @@ package com.blamejared.crafttweaker.annotation.processor.document.conversion.con
 
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.LinkConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.LinkConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.page.type.TypeParameterTypeInfo;
+import com.blamejared.crafttweaker.annotation.processor.util.Pair;
 
 import javax.lang.model.element.Element;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 public class ImportedTypeLinkConversionRule implements LinkConversionRule {
     
@@ -26,16 +30,47 @@ public class ImportedTypeLinkConversionRule implements LinkConversionRule {
     }
     
     @Override
-    public Optional<String> tryConvertToClickableMarkdown(String link, Element element) {
+    public Optional<String> tryConvertToClickableMarkdown(String link, Element element, LinkConversionRule.Context context) {
         
         try {
-            final String importedTypeQualifiedName = getQualifiedNameFor(link, element);
+            Pair<Type, Integer> construct = extract(link, element, false);
             
-            final String clickableMarkdown = linkConverter.convertLinkToClickableMarkdown(importedTypeQualifiedName, element);
-            return Optional.ofNullable(clickableMarkdown);
+            return Optional.of(construct.first().compile(linkConverter, element));
         } catch(Exception ignored) {
             return Optional.empty();
         }
+    }
+    
+    private Pair<Type, Integer> extract(String link, Element element, boolean subType) {
+        
+        Type type = new Type();
+        StringBuilder name = new StringBuilder();
+        int i = 0;
+        outer:
+        while(i < link.length()) {
+            char c = link.charAt(i++);
+            if(Character.isWhitespace(c)) {
+                continue;
+            }
+            switch(c) {
+                case '<', ',' -> {
+                    if(',' == c && subType) {
+                        i--;
+                        break outer;
+                    }
+                    Pair<Type, Integer> construct = extract(link.substring(i), element, true);
+                    Type param = construct.first();
+                    type.addParam(param);
+                    i += construct.second();
+                }
+                case '>' -> {
+                    break outer;
+                }
+                default -> name.append(c);
+            }
+        }
+        type.name(getQualifiedNameFor(name.toString(), element));
+        return new Pair<>(type, i);
     }
     
     private String getQualifiedNameFor(String link, Element element) {
@@ -64,6 +99,50 @@ public class ImportedTypeLinkConversionRule implements LinkConversionRule {
     private boolean doesImportMatchLink(String importedType, String link) {
         
         return importedType.endsWith("." + link);
+    }
+    
+    private static class Type {
+        
+        private String name;
+        private final List<Type> typeParams = new ArrayList<>();
+        
+        public void addParam(Type type) {
+            
+            this.typeParams.add(type);
+        }
+        
+        public void name(String name) {
+            
+            this.name = name;
+        }
+        
+        public String getName() {
+            
+            return name;
+        }
+        
+        public List<Type> getTypeParams() {
+            
+            return typeParams;
+        }
+        
+        public String compile(LinkConverter linkConverter, Element element) {
+            
+            return linkConverter.convertLinkToClickableMarkdown(name, element, Context.empty()
+                    .overrideTypeParams(getTypeParams().stream()
+                            .map(type -> new TypeParameterTypeInfo(type.compile(linkConverter, element)))
+                            .toList()));
+        }
+        
+        @Override
+        public String toString() {
+            
+            return new StringJoiner(", ", Type.class.getSimpleName() + "[", "]")
+                    .add("name='" + name + "'")
+                    .add("typeParams=" + typeParams)
+                    .toString();
+        }
+        
     }
     
 }

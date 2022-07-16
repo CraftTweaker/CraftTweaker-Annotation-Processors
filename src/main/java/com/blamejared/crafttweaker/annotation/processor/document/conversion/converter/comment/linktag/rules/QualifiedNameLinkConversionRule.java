@@ -3,11 +3,14 @@ package com.blamejared.crafttweaker.annotation.processor.document.conversion.con
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.LinkConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.TypeConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
+import com.blamejared.crafttweaker.annotation.processor.document.page.type.GenericTypeInfo;
+import com.blamejared.crafttweaker.annotation.processor.document.page.type.TypeParameterTypeInfo;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import java.util.List;
 import java.util.Optional;
 
 public class QualifiedNameLinkConversionRule implements LinkConversionRule {
@@ -33,9 +36,16 @@ public class QualifiedNameLinkConversionRule implements LinkConversionRule {
     }
     
     @Override
-    public Optional<String> tryConvertToClickableMarkdown(String link, Element element) {
+    public Optional<String> tryConvertToClickableMarkdown(String link, Element element, LinkConversionRule.Context context) {
         
         final AbstractTypeInfo typeInfo = getTypeInfo(link);
+        if(typeInfo instanceof GenericTypeInfo genInfo){
+            List<TypeParameterTypeInfo> overrides = context.getOverridenTypeParams();
+            if(!overrides.isEmpty()){
+               genInfo.getTypeArguments().clear();
+               genInfo.getTypeArguments().addAll(overrides);
+            }
+        }
         return Optional.ofNullable(typeInfo.getClickableMarkdown());
     }
     

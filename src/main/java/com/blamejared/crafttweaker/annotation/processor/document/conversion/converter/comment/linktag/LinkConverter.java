@@ -27,12 +27,12 @@ public class LinkConverter implements IHasPostCreationCall {
         this.messager = messager;
     }
     
-    public String convertLinkToClickableMarkdown(String link, Element element) {
+    public String convertLinkToClickableMarkdown(String link, Element element, LinkConversionRule.Context context) {
         
         try {
             return conversionRules.stream()
                     .filter(rule -> rule.canConvert(link))
-                    .map(rule -> rule.tryConvertToClickableMarkdown(link, element))
+                    .map(rule -> rule.tryConvertToClickableMarkdown(link, element, context))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst()

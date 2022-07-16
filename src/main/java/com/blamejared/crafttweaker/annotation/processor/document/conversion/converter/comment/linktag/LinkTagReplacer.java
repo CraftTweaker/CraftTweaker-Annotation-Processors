@@ -60,7 +60,7 @@ public class LinkTagReplacer {
     
     private String getReplacementFor(String linkTagContent, Element element) {
         
-        return linkConverter.convertLinkToClickableMarkdown(linkTagContent, element);
+        return linkConverter.convertLinkToClickableMarkdown(linkTagContent, element, LinkConversionRule.Context.empty());
     }
     
     

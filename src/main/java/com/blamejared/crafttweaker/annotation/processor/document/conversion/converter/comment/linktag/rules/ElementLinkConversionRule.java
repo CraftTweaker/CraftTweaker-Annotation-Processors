@@ -22,20 +22,20 @@ public class ElementLinkConversionRule implements LinkConversionRule {
     }
     
     @Override
-    public Optional<String> tryConvertToClickableMarkdown(String link, Element element) {
+    public Optional<String> tryConvertToClickableMarkdown(String link, Element element, LinkConversionRule.Context context) {
         
-        final String prefix = getPrefix(link, element);
+        final String prefix = getPrefix(link, element, context);
         final String suffix = getSuffix(link);
         
         return Optional.of(merge(prefix, suffix));
     }
     
-    private String getPrefix(String link, Element element) {
+    private String getPrefix(String link, Element element, LinkConversionRule.Context context) {
         
         final int indexOfSeparator = getIndexOfSeparator(link);
         final String substring = link.substring(0, indexOfSeparator);
         
-        return linkConverter.convertLinkToClickableMarkdown(substring, element);
+        return linkConverter.convertLinkToClickableMarkdown(substring, element, context);
     }
     
     private String getSuffix(String link) {

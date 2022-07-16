@@ -15,7 +15,7 @@ public class ThisTypeConversionRule implements LinkConversionRule {
     }
     
     @Override
-    public Optional<String> tryConvertToClickableMarkdown(String link, Element element) {
+    public Optional<String> tryConvertToClickableMarkdown(String link, Element element, LinkConversionRule.Context context) {
         
         return Optional.of("[this](.)");
     }
