@@ -44,7 +44,9 @@ public class MemberHeader implements Comparable<MemberHeader> {
     private String formatParametersForSignatureExample() {
         
         final String displayName = returnType.getDisplayName();
-        final StringJoiner stringJoiner = new StringJoiner(", ", "(", ") as " + displayName);
+        final boolean includeAs = !displayName.equals("void");
+        
+        final StringJoiner stringJoiner = new StringJoiner(", ", "(", ")" + (includeAs ? " as " + displayName : ""));
         for(DocumentedParameter parameter : parameters) {
             stringJoiner.add(parameter.formatForSignatureExample());
         }

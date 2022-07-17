@@ -6,6 +6,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.meta.IFillMeta;
 import com.blamejared.crafttweaker.annotation.processor.document.page.comment.DocumentationComment;
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.header.MemberHeader;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
+import com.blamejared.crafttweaker.annotation.processor.document.page.type.PrimitiveTypeInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,7 +54,13 @@ public class StaticMethodMember implements Comparable<StaticMethodMember>, IFill
     
     private void writeReturnType(PageOutputWriter writer) {
         
-        writer.printf("Return Type: %s%n%n", header.returnType.getClickableMarkdown());
+        boolean skip = false;
+        if(header.returnType instanceof PrimitiveTypeInfo primType) {
+            skip = primType.getDisplayName().equals("void");
+        }
+        if(!skip) {
+            writer.printf("Return Type: %s%n%n", header.returnType.getClickableMarkdown());
+        }
     }
     
     private void writeCodeBlockWithExamples(PageOutputWriter writer, AbstractTypeInfo ownerType) {
