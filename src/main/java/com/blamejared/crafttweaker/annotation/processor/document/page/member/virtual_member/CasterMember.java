@@ -25,7 +25,10 @@ public class CasterMember extends AbstractVirtualMember implements Comparable<Ca
     
     public void writeTableRow(PageOutputWriter writer) {
         
-        writer.printf("| %s | %s |%n", header.returnType.getClickableMarkdown(), isImplicit);
+        writer.currentTable()
+                .rowEntry("Result Type", header.returnType.getClickableMarkdown())
+                .rowEntry("Is Implicit", isImplicit)
+                .endRow();
     }
     
 }

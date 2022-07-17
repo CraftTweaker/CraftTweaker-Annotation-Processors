@@ -1,6 +1,7 @@
 package com.blamejared.crafttweaker.annotation.processor.document.page.member.header;
 
 import com.blamejared.crafttweaker.annotation.processor.document.file.PageOutputWriter;
+import com.blamejared.crafttweaker.annotation.processor.document.file.Table;
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.header.examples.ExampleData;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 
@@ -137,9 +138,8 @@ public class MemberHeader implements Comparable<MemberHeader> {
     }
     
     private void writeParameterDescriptionTableWithoutOptionals(PageOutputWriter writer) {
-        
-        writer.println("| Parameter | Type | Description |");
-        writer.println("|-----------|------|-------------|");
+    
+        writer.newTable().key("Parameter").key("Type").key("Description");
         for(DocumentedParameter parameter : parameters) {
             parameter.writeParameterInfoExcludeOptionality(writer);
         }
@@ -147,13 +147,12 @@ public class MemberHeader implements Comparable<MemberHeader> {
         for(DocumentedGenericParameter genericParameter : genericParameters) {
             genericParameter.writeParameterInfoExcludeOptionality(writer);
         }
-        writer.println();
+        writer.println(writer.currentTable().write());
     }
     
     private void writeParameterDescriptionTableWithOptionals(PageOutputWriter writer) {
-        
-        writer.println("| Parameter | Type | Description | Optional | DefaultValue |");
-        writer.println("|-----------|------|-------------|----------|--------------|");
+    
+        writer.newTable().key("Parameter").key("Type").key("Description").key("Optional").key("Default Value");
         for(DocumentedParameter parameter : parameters) {
             parameter.writeParameterInfoIncludeOptionality(writer);
         }
@@ -161,7 +160,7 @@ public class MemberHeader implements Comparable<MemberHeader> {
         for(DocumentedGenericParameter parameter : genericParameters) {
             parameter.writeParameterInfoIncludeOptionality(writer);
         }
-        writer.println();
+        writer.println(writer.currentTable().write());
     }
     
     private boolean hasOptionalTypes() {

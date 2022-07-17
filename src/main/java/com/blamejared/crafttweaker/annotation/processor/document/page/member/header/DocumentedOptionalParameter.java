@@ -21,7 +21,12 @@ public class DocumentedOptionalParameter extends DocumentedParameter {
     @Override
     public void writeParameterInfoIncludeOptionality(PageOutputWriter writer) {
         
-        writer.printf("| %s | %s | %s | %s | %s |%n", name, type.getClickableMarkdown(), getDescription(), true, getDefaultValue());
+        writer.currentTable()
+                .rowEntry("Parameter", name)
+                .rowEntry("Type", type.getClickableMarkdown())
+                .rowEntry("Description", getDescription())
+                .rowEntry("Optional", true)
+                .rowEntry("Default Value", getDefaultValue()).endRow();
     }
     
     public String getDefaultValue() {

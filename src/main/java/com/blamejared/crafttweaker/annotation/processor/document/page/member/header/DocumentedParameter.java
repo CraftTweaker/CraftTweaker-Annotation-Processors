@@ -1,6 +1,7 @@
 package com.blamejared.crafttweaker.annotation.processor.document.page.member.header;
 
 import com.blamejared.crafttweaker.annotation.processor.document.file.PageOutputWriter;
+import com.blamejared.crafttweaker.annotation.processor.document.file.Table;
 import com.blamejared.crafttweaker.annotation.processor.document.page.comment.DocumentationComment;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 
@@ -41,12 +42,21 @@ public class DocumentedParameter implements Comparable<DocumentedParameter> {
     
     public void writeParameterInfoIncludeOptionality(PageOutputWriter writer) {
         
-        writer.printf("| %s | %s | %s | %s | %s |%n", name, type.getClickableMarkdown(), getDescription(), false, "");
+        writeParameterInfo(writer)
+                .rowEntry("Optional", false).endRow();
     }
     
     public void writeParameterInfoExcludeOptionality(PageOutputWriter writer) {
         
-        writer.printf("| %s | %s | %s |%n", name, type.getClickableMarkdown(), getDescription());
+        writeParameterInfo(writer).endRow();
+    }
+    
+    private Table writeParameterInfo(PageOutputWriter writer) {
+        
+        return writer.currentTable()
+                .rowEntry("Parameter", name)
+                .rowEntry("Type", type.getClickableMarkdown())
+                .rowEntry("Description", getDescription());
     }
     
     public String getExample(int index) {

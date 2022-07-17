@@ -41,7 +41,7 @@ public class DocumentationComment {
     
     public String getDescription() {
         
-        return getOptionalDescription().orElse("No Description Provided");
+        return getOptionalDescription().orElse("");
     }
     
     public String getMarkdownDescription() {

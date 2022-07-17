@@ -41,7 +41,13 @@ public class PropertyMember implements IFillMeta {
     
     public void writeTableRow(PageOutputWriter writer) {
         
-        writer.printf("| %s | %s | %s | %s | %s |%n", name, type.getClickableMarkdown(), hasGetter, hasSetter, comment.getMarkdownDescription());
+        writer.currentTable()
+                .rowEntry("Name", name)
+                .rowEntry("Type", type.getClickableMarkdown())
+                .rowEntry("Has Getter", hasGetter)
+                .rowEntry("Has Setter", hasSetter)
+                .rowEntry("Description", comment.getMarkdownDescription())
+                .endRow();
     }
     
     public String getName() {

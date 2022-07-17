@@ -42,12 +42,11 @@ public class DocumentedStaticMembers implements IFillMeta {
         
         // TODO("Support deprecation and since properly, along with better documentation format")
         writer.printf("## Static Properties%n%n");
-        writer.println("| Name | Type | Has Getter | Has Setter | Description |");
-        writer.println("|------|------|------------|------------|-------------|");
+        writer.newTable().key("Name").key("Type").key("Has Getter").key("Has Setter").key("Description");
         for(PropertyMember value : properties.values()) {
             value.writeTableRow(writer);
         }
-        writer.println();
+        writer.println(writer.currentTable().write());
     }
     
     public void addProperty(PropertyMember propertyMember) {

@@ -8,6 +8,8 @@ public class PageOutputWriter implements AutoCloseable, Closeable {
     
     private final PrintWriter backend;
     
+    private Table currentTable;
+    
     PageOutputWriter(final PrintWriter backend) {
         
         this.backend = backend;
@@ -53,7 +55,7 @@ public class PageOutputWriter implements AutoCloseable, Closeable {
     }
     
     public void pageSince(final String sinceVersion) {
-    
+        
         if(sinceVersion == null) {
             return;
         }
@@ -61,7 +63,7 @@ public class PageOutputWriter implements AutoCloseable, Closeable {
     }
     
     public void deprecationMessage(final String deprecationMessage) {
-    
+        
         if(deprecationMessage == null) {
             return;
         }
@@ -77,6 +79,18 @@ public class PageOutputWriter implements AutoCloseable, Closeable {
         
         this.printf("::requiredMod[%s]{builtIn=false modLink=%s requiredMod=%s requiredModLink=%s}", mod,
                 this.fromSlugToLinkIfNeeded(modLink), requiredMod, this.fromSlugToLinkIfNeeded(requiredModLink));
+    }
+    
+    
+    public Table newTable() {
+        
+        this.currentTable = new Table();
+        return this.currentTable;
+    }
+    
+    public Table currentTable() {
+        
+        return currentTable;
     }
     
     private String fromSlugToLinkIfNeeded(final String slug) {

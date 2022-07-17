@@ -53,6 +53,7 @@ dependencies {
     implementation("io.toolisticon.aptk:annotationwrapper-api:0.17.1")
     implementation("org.reflections:reflections:0.10.2")
     implementation("com.google.code.gson:gson:2.8.9")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 
     annotationProcessor("io.toolisticon.aptk:annotationwrapper-processor:0.17.1")
     annotationProcessor("com.google.auto.service:auto-service:1.0.1")
