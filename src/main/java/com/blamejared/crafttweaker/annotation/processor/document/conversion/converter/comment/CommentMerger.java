@@ -15,11 +15,12 @@ public class CommentMerger {
         final String description = mergeDescription(childComment);
         final String deprecation = mergeDeprecation(childComment, parentComment);
         final String sinceVersion = mergeSince(childComment, parentComment);
+        final String obtention = mergeObtention(childComment, parentComment);
         final ExampleData exampleData = mergeCommentExamples(childComment, parentComment);
         // We don't care about the parent description.
         final MetaData metaData = childComment.getMetaData();
         
-        return new DocumentationComment(description, deprecation, sinceVersion, exampleData, metaData);
+        return new DocumentationComment(description, deprecation, sinceVersion, obtention, exampleData, metaData);
     }
     
     private String mergeDescription(DocumentationComment childComment) {
@@ -35,6 +36,11 @@ public class CommentMerger {
     private String mergeSince(final DocumentationComment child, final DocumentationComment parent) {
         
         return child.getOptionalSince().orElseGet(parent::getSinceVersion);
+    }
+    
+    private String mergeObtention(final DocumentationComment child, final DocumentationComment parent) {
+        
+        return child.getOptionalObtention().orElseGet(parent::getObtention);
     }
     
     private ExampleData mergeCommentExamples(DocumentationComment childComment, DocumentationComment parentComment) {

@@ -79,10 +79,12 @@ public class NativeTypeVirtualMemberConverter extends ExpansionVirtualMemberConv
         final String description = constructor.description();
         final String deprecation = this.nullIfEmpty(constructor.deprecationMessage());
         final String since = this.nullIfEmpty(constructor.getSinceVersion());
+        final String obtention = this.nullIfEmpty(constructor.getObtention());
+        
         final ExampleData exampleData = ExampleData.empty();
         final MetaData metaData = MetaData.empty();
         
-        return new DocumentationComment(description, deprecation, since, exampleData, metaData);
+        return new DocumentationComment(description, deprecation, since, obtention, exampleData, metaData);
     }
     
     private String nullIfEmpty(final String string) {
@@ -130,7 +132,7 @@ public class NativeTypeVirtualMemberConverter extends ExpansionVirtualMemberConv
         final String description = constructorParameter.description();
         final ExampleData exampleData = extractExampleDataForParameter(constructorParameter);
         
-        return new DocumentationComment(description, null, null, exampleData, MetaData.empty());
+        return new DocumentationComment(description, null, null, null, exampleData, MetaData.empty());
     }
     
     private ExampleData extractExampleDataForParameter(NativeConstructor.ConstructorParameter constructorParameter) {

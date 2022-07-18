@@ -2,7 +2,10 @@ package com.blamejared.crafttweaker.annotation.processor.document.conversion.con
 
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.event.EventDataConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.example.ExampleDataConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.DeprecationConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.MetaConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.ObtentionConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.SinceInformationConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.member.header.ParameterDescriptionConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.meta.MetaData;
 import com.blamejared.crafttweaker.annotation.processor.document.page.comment.DocumentationComment;
@@ -12,11 +15,8 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.member.hea
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
+import java.util.Optional;
 
 public class CommentConverter {
     
@@ -25,8 +25,10 @@ public class CommentConverter {
     private final ExampleDataConverter exampleDataConverter;
     private final MetaConverter metaDataConverter;
     private final DescriptionConverter descriptionConverter;
-    private final DeprecationFinder deprecationFinder;
-    private final SinceInformationIdentifier sinceIdentifier;
+    private final DeprecationConverter deprecationConverter;
+    private final SinceInformationConverter sinceConverter;
+    private final ObtentionConverter obtentionConverter;
+    
     private final ParameterDescriptionConverter parameterDescriptionConverter;
     private final EventDataConverter eventDataConverter;
     
@@ -34,8 +36,8 @@ public class CommentConverter {
                             final ExampleDataConverter exampleDataConverter, final MetaConverter metaConverter,
                             final DescriptionConverter descriptionConverter,
                             final ParameterDescriptionConverter parameterDescriptionConverter,
-                            final EventDataConverter eventDataConverter, final DeprecationFinder deprecationFinder,
-                            final SinceInformationIdentifier sinceIdentifier) {
+                            final EventDataConverter eventDataConverter, final DeprecationConverter deprecationConverter,
+                            final SinceInformationConverter sinceConverter, final ObtentionConverter obtentionConverter) {
         
         this.processingEnv = processingEnv;
         this.commentMerger = commentMerger;
@@ -44,15 +46,16 @@ public class CommentConverter {
         this.descriptionConverter = descriptionConverter;
         this.parameterDescriptionConverter = parameterDescriptionConverter;
         this.eventDataConverter = eventDataConverter;
-        this.deprecationFinder = deprecationFinder;
-        this.sinceIdentifier = sinceIdentifier;
+        this.deprecationConverter = deprecationConverter;
+        this.sinceConverter = sinceConverter;
+        this.obtentionConverter = obtentionConverter;
     }
     
     public DocumentationComment convertForType(TypeElement typeElement) {
         
         DocumentationComment documentationComment = convertElement(typeElement);
         if(typeElement.getSimpleName().toString().endsWith("Event")) {
-            return fastMergeComments(documentationComment, covertEvent(typeElement));
+            return fastMergeComments(documentationComment, convertEvent(typeElement));
         }
         return documentationComment;
     }
@@ -103,7 +106,7 @@ public class CommentConverter {
         return mergeComments(comment, enclosingElementComment);
     }
     
-    private DocumentationComment covertEvent(Element element) {
+    private DocumentationComment convertEvent(Element element) {
         
         return eventDataConverter.getDocumentationComment(processingEnv.getElementUtils()
                 .getDocComment(element), element);
@@ -113,41 +116,44 @@ public class CommentConverter {
     private DocumentationComment getCommentForElement(Element element) {
         
         final String docComment = processingEnv.getElementUtils().getDocComment(element);
-        final String description = extractDescriptionFrom(docComment, element);
+        final String description = extractDescriptionFrom(docComment, element).orElse(null);
         // TODO: Handle @apiNote
-        final String deprecation = extractDeprecationFrom(docComment, element);
-        final String sinceVersion = extractSinceFrom(docComment, element);
-        final ExampleData exampleData = extractExampleDataFrom(docComment, element);
-        final MetaData metaData = extractMetaDataFrom(docComment, element);
-        return new DocumentationComment(description, deprecation, sinceVersion, exampleData, metaData);
+        final String deprecation = extractDeprecationFrom(docComment, element).orElse(null);
+        final String sinceVersion = extractSinceFrom(docComment, element).orElse(null);
+        final String obtention = extractObtentionFrom(docComment, element).orElse(null);
+        final ExampleData exampleData = extractExampleDataFrom(docComment, element).orElseGet(ExampleData::empty);
+        final MetaData metaData = extractMetaDataFrom(docComment, element).orElseGet(MetaData::empty);
+        return new DocumentationComment(description, deprecation, sinceVersion, obtention, exampleData, metaData);
     }
     
-    @Nullable
-    private String extractDescriptionFrom(@Nullable String docComment, Element element) {
+    private Optional<String> extractDescriptionFrom(@Nullable String docComment, Element element) {
         
         return descriptionConverter.convertFromCommentString(docComment, element);
     }
     
-    @Nullable
-    private String extractDeprecationFrom(@Nullable final String docComment, final Element element) {
+    private Optional<String> extractDeprecationFrom(@Nullable final String docComment, final Element element) {
         
-        return this.deprecationFinder.findInCommentString(docComment, element);
+        return this.deprecationConverter.fromComment(docComment, element);
     }
     
-    @Nullable
-    private String extractSinceFrom(@Nullable final String docComment, final Element element) {
+    private Optional<String> extractSinceFrom(@Nullable final String docComment, final Element element) {
         
-        return this.sinceIdentifier.findInCommentString(docComment, element);
+        return this.sinceConverter.fromComment(docComment, element);
     }
     
-    private ExampleData extractExampleDataFrom(String docComment, Element element) {
+    private Optional<String> extractObtentionFrom(@Nullable final String docComment, final Element element) {
         
-        return exampleDataConverter.convertFromCommentString(docComment, element);
+        return this.obtentionConverter.fromComment(docComment, element);
     }
     
-    private MetaData extractMetaDataFrom(String docComment, Element element) {
+    private Optional<ExampleData> extractExampleDataFrom(String docComment, Element element) {
         
-        return metaDataConverter.convertFromCommentString(docComment, element);
+        return exampleDataConverter.fromComment(docComment, element);
+    }
+    
+    private Optional<MetaData> extractMetaDataFrom(String docComment, Element element) {
+        
+        return metaDataConverter.fromComment(docComment, element);
     }
     
     private DocumentationComment getCommentFromEnclosingElement(Element element) {
@@ -177,7 +183,7 @@ public class CommentConverter {
     @SuppressWarnings("unused") // second may be used later
     private DocumentationComment fastMergeWithDescription(final DocumentationComment first, final DocumentationComment second, final String description) {
         
-        return new DocumentationComment(description, first.getDeprecationMessage(), first.getSinceVersion(), first.getExamples(), first.getMetaData());
+        return new DocumentationComment(description, first.getDeprecationMessage(), first.getSinceVersion(), first.getObtention(), first.getExamples(), first.getMetaData());
     }
     
     private DocumentationComment fillExampleForThisParameterFromPageInfo(DocumentationComment comment, DocumentationPageInfo pageInfo) {

@@ -8,6 +8,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.conversion.conv
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
+import java.util.Optional;
 
 public class DescriptionConverter {
     
@@ -25,46 +26,18 @@ public class DescriptionConverter {
         this.parameterRemover = parameterRemover;
     }
     
-    @Nullable
-    public String convertFromCommentString(@Nullable String docComment, Element element) {
+    public Optional<String> convertFromCommentString(@Nullable String docComment, Element element) {
         
         if(docComment == null) {
-            return null;
+            return Optional.empty();
         }
-        
-        return convertNonNullCommentString(docComment, element);
-    }
     
-    @Nonnull
-    private String convertNonNullCommentString(String docComment, Element element) {
-        
-        docComment = replaceLinkTagsWithClickableMarkdown(docComment, element);
-        docComment = replaceCodeTagsWithCodeSections(docComment);
-        docComment = convertParagraphsToMarkdownFormatFromHtml(docComment);
+        docComment = this.linkTagReplacer.replaceLinkTagsFrom(docComment, element);
+        docComment = this.codeTagReplacer.replaceCodeTags(docComment);
+        docComment = this.paragraphMarkdownConverter.convertParagraphToMarkdown(docComment);
         // TODO: Convert tables
-        docComment = removeDocumentationParameters(docComment);
-        return docComment.trim();
+        docComment = parameterRemover.removeDocumentationParametersFrom(docComment);
+        return Optional.of(docComment.strip());
     }
-    
-    private String replaceLinkTagsWithClickableMarkdown(String docComment, Element element) {
-        
-        return linkTagReplacer.replaceLinkTagsFrom(docComment, element);
-    }
-    
-    private String replaceCodeTagsWithCodeSections(String docComment) {
-        
-        return this.codeTagReplacer.replaceCodeTags(docComment);
-    }
-    
-    private String convertParagraphsToMarkdownFormatFromHtml(String docComment) {
-        
-        return this.paragraphMarkdownConverter.convertParagraphToMarkdown(docComment);
-    }
-    
-    private String removeDocumentationParameters(String docComment) {
-        
-        return parameterRemover.removeDocumentationParametersFrom(docComment);
-    }
-    
     
 }

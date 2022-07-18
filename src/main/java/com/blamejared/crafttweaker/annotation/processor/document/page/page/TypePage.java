@@ -55,8 +55,18 @@ public class TypePage extends DocumentationPage {
         
         super.beforeWritingMembers(writer);
         writeImport(writer);
+        writeObtention(writer);
         writeSuperClass(writer);
         writeImplementedInterfaces(writer);
+    }
+    
+    private void writeObtention(PageOutputWriter writer) {
+        
+        pageInfo.getClassComment().getOptionalObtention().ifPresent(obt -> {
+            writer.println("## How to obtain");
+            writer.println(obt);
+            writer.println();
+        });
     }
     
     private void writeImport(PageOutputWriter writer) {

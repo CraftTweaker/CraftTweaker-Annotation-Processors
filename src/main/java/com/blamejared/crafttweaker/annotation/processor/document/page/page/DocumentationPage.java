@@ -10,6 +10,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.member.vir
 import com.google.gson.Gson;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public abstract class DocumentationPage implements IFillMeta {
     
@@ -66,12 +67,12 @@ public abstract class DocumentationPage implements IFillMeta {
     
     protected void writeDescription(PageOutputWriter writer) {
         
-        final Optional<String> description = pageInfo.getClassComment().getOptionalDescription();
+        final Optional<String> description = pageInfo.getClassComment().getOptionalDescription().filter(Predicate.not(String::isBlank));
         
-        if(description.isPresent()) {
-            writer.println(description.get());
+        description.ifPresent(desc -> {
+            writer.println(desc);
             writer.println();
-        }
+        });
     }
     
     protected abstract void writeOwnerModId(PageOutputWriter writer);

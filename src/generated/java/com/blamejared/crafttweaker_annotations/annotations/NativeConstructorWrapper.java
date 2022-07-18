@@ -131,6 +131,23 @@ public class NativeConstructorWrapper {
         return AnnotationUtils.getAnnotationValueOfAttribute(annotationMirror,"getSinceVersion") == null;
     }
 
+    /**
+     * Gets the NativeConstructor.getObtention from wrapped annotation.
+     * @return the attribute value
+     */
+    public String getObtention() {
+        return (String)AnnotationUtils.getAnnotationValueOfAttributeWithDefaults(annotationMirror, "getObtention").getValue();
+    }
+
+
+    /**
+     * Allows to check if attribute was explicitly set or if default value is used.
+     * @return true, if default value is used, otherwise false
+     */
+    public boolean getObtentionIsDefaultValue(){
+        return AnnotationUtils.getAnnotationValueOfAttribute(annotationMirror,"getObtention") == null;
+    }
+
 
 
     /**

@@ -1,6 +1,7 @@
 package com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.example;
 
 
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.SimpleCommentConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.documentation_parameter.ParameterInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.documentation_parameter.ParameterInformationList;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.documentation_parameter.ParameterReader;
@@ -9,15 +10,14 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.member.hea
 
 import javax.lang.model.element.Element;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class ExampleDataConverter {
-    
-    private static final String DOC_PARAM = "docParam";
-    
+public class ExampleDataConverter implements SimpleCommentConverter<ExampleData> {
+
     private final ParameterReader reader;
     
     public ExampleDataConverter(ParameterReader reader) {
@@ -25,30 +25,23 @@ public class ExampleDataConverter {
         this.reader = reader;
     }
     
-    public ExampleData convertFromCommentString(String docComment, Element element) {
+    @Override
+    public ExampleData fromParameterInfo(ParameterInfo info) {
         
-        final ParameterInformationList parameterInformationList = reader.readParametersFrom(docComment, element);
-        if(hasExampleData(parameterInformationList)) {
-            return getExampleDataFrom(parameterInformationList);
-        }
-        return ExampleData.empty();
-    }
-    
-    private boolean hasExampleData(ParameterInformationList parameterInformationList) {
-        
-        return parameterInformationList.hasParameterInfoWithName(DOC_PARAM);
-    }
-    
-    private ExampleData getExampleDataFrom(ParameterInformationList parameterInformationList) {
-        
-        final ParameterInfo docParamInfo = parameterInformationList.getParameterInfoWithName(DOC_PARAM);
-        return getExampleDataFromParameterInfo(docParamInfo);
-    }
-    
-    private ExampleData getExampleDataFromParameterInfo(ParameterInfo docParamInfo) {
-        
-        final Map<String, Example> examples = getExamplesFrom(docParamInfo);
+        final Map<String, Example> examples = getExamplesFrom(info);
         return new ExampleData(examples);
+    }
+    
+    @Override
+    public String getMarker() {
+        
+        return "docParam";
+    }
+    
+    @Override
+    public BiFunction<String, Element, ParameterInformationList> getParameterInformationList() {
+        
+        return reader::readParametersFrom;
     }
     
     private Map<String, Example> getExamplesFrom(ParameterInfo docParamInfo) {

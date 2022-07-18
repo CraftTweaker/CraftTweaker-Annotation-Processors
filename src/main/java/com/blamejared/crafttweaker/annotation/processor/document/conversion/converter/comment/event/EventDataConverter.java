@@ -1,11 +1,12 @@
 package com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.event;
 
 
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.DeprecationFinder;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.SinceInformationIdentifier;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.documentation_parameter.ParameterInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.documentation_parameter.ParameterInformationList;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.documentation_parameter.ParameterReader;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.DeprecationConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.ObtentionConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.meta.SinceInformationConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.meta.MetaData;
 import com.blamejared.crafttweaker.annotation.processor.document.page.comment.DocumentationComment;
 import com.blamejared.crafttweaker.annotation.processor.document.page.member.header.examples.ExampleData;
@@ -26,15 +27,17 @@ public class EventDataConverter {
     private static final String HAS_RESULT_INFO = "The event has a result.";
     
     private final ParameterReader reader;
-    private final DeprecationFinder deprecationFinder;
-    private final SinceInformationIdentifier sinceInformationIdentifier;
+    private final DeprecationConverter deprecationFinder;
+    private final SinceInformationConverter sinceInformationConverter;
+    private final ObtentionConverter obtentionConverter;
     
-    public EventDataConverter(final ParameterReader reader, final DeprecationFinder deprecationFinder,
-                              final SinceInformationIdentifier sinceInformationIdentifier) {
+    public EventDataConverter(final ParameterReader reader, final DeprecationConverter deprecationFinder,
+                              final SinceInformationConverter sinceInformationConverter, final ObtentionConverter obtentionConverter) {
         
         this.reader = reader;
         this.deprecationFinder = deprecationFinder;
-        this.sinceInformationIdentifier = sinceInformationIdentifier;
+        this.sinceInformationConverter = sinceInformationConverter;
+        this.obtentionConverter = obtentionConverter;
     }
     
     public DocumentationComment getDocumentationComment(String docComment, Element element) {
@@ -43,6 +46,7 @@ public class EventDataConverter {
         if(!hasEventData(parameterInformationList)) {
             return new DocumentationComment(
                     NOT_CANCELED_INFO + "\n\n" + NO_RESULT_INFO,
+                    null,
                     null,
                     null,
                     ExampleData.empty(),
@@ -59,14 +63,14 @@ public class EventDataConverter {
             sb.append("\n\n");
             for(String occurrence : parameterInfo.getOccurrences()) {
                 switch(getTypeNameFrom(occurrence)) {
-                    case CANCELED:
+                    case CANCELED -> {
                         sb.append("If the event is canceled, ");
                         sb.append(getTypeTextValueFrom(occurrence));
-                        break;
-                    case NOT_CANCELED:
+                    }
+                    case NOT_CANCELED -> {
                         sb.append("If the event is not canceled, ");
                         sb.append(getTypeTextValueFrom(occurrence));
-                        break;
+                    }
                 }
                 sb.append("\n\n");
             }
@@ -79,26 +83,27 @@ public class EventDataConverter {
             sb.append("\n\n");
             for(String occurrence : parameterInfo.getOccurrences()) {
                 switch(getTypeNameFrom(occurrence)) {
-                    case ALLOW:
+                    case ALLOW -> {
                         sb.append("If result is set to `allow`, ");
                         sb.append(getTypeTextValueFrom(occurrence));
-                        break;
-                    case DEFAULT:
+                    }
+                    case DEFAULT -> {
                         sb.append("If result is set to `default`, ");
                         sb.append(getTypeTextValueFrom(occurrence));
-                        break;
-                    case DENY:
+                    }
+                    case DENY -> {
                         sb.append("If result is set to `deny`, ");
                         sb.append(getTypeTextValueFrom(occurrence));
-                        break;
+                    }
                 }
                 sb.append("\n\n");
             }
         }
         return new DocumentationComment(
                 sb.toString(),
-                this.deprecationFinder.findInCommentString(docComment, element),
-                this.sinceInformationIdentifier.findInCommentString(docComment, element),
+                this.deprecationFinder.fromComment(docComment, element).orElse(null),
+                this.sinceInformationConverter.fromComment(docComment, element).orElse(null),
+                this.obtentionConverter.fromComment(docComment, element).orElse(null),
                 ExampleData.empty(),
                 MetaData.empty()
         );

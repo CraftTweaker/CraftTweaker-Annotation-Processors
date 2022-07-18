@@ -11,22 +11,24 @@ public class DocumentationComment {
     private final String description;
     private final String deprecationMessage;
     private final String sinceVersion;
+    private final String obtention;
     private final ExampleData exampleData;
     private final MetaData metaData;
     
-    public DocumentationComment(final String description, final String deprecationMessage, final String sinceVersion,
+    public DocumentationComment(final String description, final String deprecationMessage, final String sinceVersion, final String obtention,
                                 final ExampleData data, final MetaData metaData) {
         
         this.description = description;
         this.deprecationMessage = deprecationMessage == null ? null : deprecationMessage.replaceAll("(\r)?\n", "");
         this.sinceVersion = sinceVersion;
+        this.obtention = obtention;
         this.exampleData = data;
         this.metaData = metaData;
     }
     
     public static DocumentationComment empty() {
         
-        return new DocumentationComment(null, null, null, ExampleData.empty(), MetaData.empty());
+        return new DocumentationComment(null, null, null, null, ExampleData.empty(), MetaData.empty());
     }
     
     public ExampleData getExamples() {
@@ -82,6 +84,16 @@ public class DocumentationComment {
     public Optional<String> getOptionalSince() {
         
         return Optional.ofNullable(this.sinceVersion);
+    }
+    
+    public String getObtention() {
+        
+        return obtention;
+    }
+    
+    public Optional<String> getOptionalObtention() {
+        
+        return Optional.ofNullable(obtention);
     }
     
     public int numberOfExamplesFor(String name) {
