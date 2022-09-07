@@ -23,19 +23,20 @@ public class KeywordValidationProcessor extends CraftTweakerProcessor {
     private final Map<String, Function<Element, Optional<Set<String>>>> annotationConverters = Util.make(new HashMap<>(), map -> {
         
         map.put(ZenCodeType.Method.class.getCanonicalName(), element -> Optional.ofNullable(MethodWrapper.wrap(element))
-                .map(MethodWrapper::value).map(Set::of));
+                .map(MethodWrapper::value).filter(Predicate.not(String::isBlank)).map(Set::of));
         
         map.put(ZenCodeType.Getter.class.getCanonicalName(), element -> Optional.ofNullable(GetterWrapper.wrap(element))
-                .map(GetterWrapper::value).map(Set::of));
+                .map(GetterWrapper::value).filter(Predicate.not(String::isBlank)).map(Set::of));
         
         map.put(ZenCodeType.Setter.class.getCanonicalName(), element -> Optional.ofNullable(SetterWrapper.wrap(element))
-                .map(SetterWrapper::value).map(Set::of));
+                .map(SetterWrapper::value).filter(Predicate.not(String::isBlank)).map(Set::of));
         
         map.put(ZenCodeType.Field.class.getCanonicalName(), element -> Optional.ofNullable(FieldWrapper.wrap(element))
-                .map(FieldWrapper::value).map(Set::of));
+                .map(FieldWrapper::value).filter(Predicate.not(String::isBlank)).map(Set::of));
         
         map.put(ZenCodeType.Name.class.getCanonicalName(), element -> Optional.ofNullable(NameWrapper.wrap(element))
                 .map(NameWrapper::value)
+                .filter(Predicate.not(String::isBlank))
                 .map(s -> Arrays.stream(s.split("\\.")))
                 .map(stringStream -> stringStream.collect(Collectors.toSet())));
     });
