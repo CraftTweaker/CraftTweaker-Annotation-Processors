@@ -4,6 +4,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ZenCodeKeywordUtil {
     
@@ -97,6 +98,25 @@ public class ZenCodeKeywordUtil {
         if(isKeyword(name)) {
             final String message = String.format("Name '%s' is a ZenCode keyword!", name);
             messager.printMessage(Diagnostic.Kind.ERROR, message, element);
+        }
+    }
+    
+    public void checkName(Set<String> names, Element element, Messager messager) {
+        
+        Set<String> invalidNames = names.stream().filter(this::isKeyword).collect(Collectors.toSet());
+        
+        if(!invalidNames.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            if(names.size() == 1) {
+                builder.append("Name '").append(invalidNames.iterator().next()).append("' is a ZenCode keyword!");
+            } else {
+                builder.append("Invalid name(s) found in full name: '")
+                        .append(String.join(".", names))
+                        .append("': '")
+                        .append(String.join(", ", invalidNames))
+                        .append("'");
+            }
+            messager.printMessage(Diagnostic.Kind.ERROR, builder, element);
         }
     }
     

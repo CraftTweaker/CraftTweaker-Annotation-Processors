@@ -2,44 +2,42 @@ package com.blamejared.crafttweaker.annotation.processor.validation.keyword;
 
 import com.blamejared.crafttweaker.annotation.processor.CraftTweakerProcessor;
 import com.blamejared.crafttweaker.annotation.processor.util.Util;
-import com.blamejared.crafttweaker.annotation.processor.util.annotations.AnnotationMirrorUtil;
 import com.blamejared.crafttweaker.annotation.processor.validation.util.ZenCodeKeywordUtil;
 import com.google.auto.service.AutoService;
-import io.toolisticon.aptk.tools.ElementUtils;
 import io.toolisticon.aptk.tools.TypeUtils;
-import org.openzen.zencode.java.FieldWrapper;
-import org.openzen.zencode.java.GetterWrapper;
-import org.openzen.zencode.java.MethodWrapper;
-import org.openzen.zencode.java.SetterWrapper;
-import org.openzen.zencode.java.ZenCodeType;
+import org.openzen.zencode.java.*;
 
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @AutoService(Processor.class)
 public class KeywordValidationProcessor extends CraftTweakerProcessor {
     
-    private final Map<String, Function<Element, Optional<String>>> annotationConverters = Util.make(new HashMap<>(), map -> {
+    private final Map<String, Function<Element, Optional<Set<String>>>> annotationConverters = Util.make(new HashMap<>(), map -> {
+        
         map.put(ZenCodeType.Method.class.getCanonicalName(), element -> Optional.ofNullable(MethodWrapper.wrap(element))
-                .map(MethodWrapper::value));
+                .map(MethodWrapper::value).map(Set::of));
+        
         map.put(ZenCodeType.Getter.class.getCanonicalName(), element -> Optional.ofNullable(GetterWrapper.wrap(element))
-                .map(GetterWrapper::value));
+                .map(GetterWrapper::value).map(Set::of));
+        
         map.put(ZenCodeType.Setter.class.getCanonicalName(), element -> Optional.ofNullable(SetterWrapper.wrap(element))
-                .map(SetterWrapper::value));
+                .map(SetterWrapper::value).map(Set::of));
+        
         map.put(ZenCodeType.Field.class.getCanonicalName(), element -> Optional.ofNullable(FieldWrapper.wrap(element))
-                .map(FieldWrapper::value));
+                .map(FieldWrapper::value).map(Set::of));
+        
+        map.put(ZenCodeType.Name.class.getCanonicalName(), element -> Optional.ofNullable(NameWrapper.wrap(element))
+                .map(NameWrapper::value)
+                .map(s -> Arrays.stream(s.split("\\.")))
+                .map(stringStream -> stringStream.collect(Collectors.toSet())));
     });
     private ZenCodeKeywordUtil keywordUtil;
     
@@ -52,7 +50,7 @@ public class KeywordValidationProcessor extends CraftTweakerProcessor {
     @Override
     public Collection<Class<? extends Annotation>> getSupportedAnnotationClasses() {
         
-        return List.of(ZenCodeType.Method.class, ZenCodeType.Getter.class, ZenCodeType.Setter.class, ZenCodeType.Field.class);
+        return List.of(ZenCodeType.Method.class, ZenCodeType.Getter.class, ZenCodeType.Setter.class, ZenCodeType.Field.class, ZenCodeType.Name.class);
     }
     
     @Override
@@ -70,9 +68,9 @@ public class KeywordValidationProcessor extends CraftTweakerProcessor {
         
         annotationConverters.get(TypeUtils.TypeConversion.convertToFqn(annotation.asType()))
                 .apply(element)
-                .filter(s -> !s.isBlank())
-                .ifPresentOrElse(name -> {
-                    keywordUtil.checkName(name, element, this.messager());
+                .filter(Predicate.not(Set::isEmpty))
+                .ifPresentOrElse(names -> {
+                    keywordUtil.checkName(names, element, this.messager());
                 }, () -> keywordUtil.checkName(element, this.messager()));
     }
     
