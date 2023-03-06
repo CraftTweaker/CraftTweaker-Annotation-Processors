@@ -21,6 +21,8 @@ import com.blamejared.crafttweaker.annotation.processor.document.page.page.Expan
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.GenericTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.TypePageTypeInfo;
+import com.blamejared.crafttweaker_annotations.annotations.TypedExpansionWrapper;
+import org.openzen.zencode.java.ExpansionWrapper;
 import org.openzen.zencode.java.ZenCodeType;
 
 import javax.lang.model.element.TypeElement;
@@ -47,7 +49,7 @@ public class ExpansionConverter extends DocumentConverter {
     @Override
     public boolean canConvert(TypeElement typeElement) {
         
-        return typeElement.getAnnotation(ZenCodeType.Expansion.class) != null;
+        return ExpansionWrapper.isAnnotated(typeElement) || TypedExpansionWrapper.isAnnotated(typeElement);
     }
     
     @Override
@@ -64,10 +66,17 @@ public class ExpansionConverter extends DocumentConverter {
     
     private AbstractTypeInfo getExpandedType(TypeElement typeElement) {
         
-        final ZenCodeType.Expansion expansion = typeElement.getAnnotation(ZenCodeType.Expansion.class);
-        
-        final TypeName expandedName = new TypeName(expansion.value());
-        return typeConverter.convertByName(expandedName);
+        if(ExpansionWrapper.isAnnotated(typeElement)) {
+            final ZenCodeType.Expansion expansion = typeElement.getAnnotation(ZenCodeType.Expansion.class);
+            
+            final TypeName expandedName = new TypeName(expansion.value());
+            return typeConverter.convertByName(expandedName);
+        }
+        TypedExpansionWrapper typedExpansion = TypedExpansionWrapper.wrap(typeElement);
+        if(typedExpansion != null) {
+            return typeConverter.convertType(typedExpansion.valueAsTypeMirror());
+        }
+        throw new IllegalArgumentException("Type element: '" + typedExpansion + "' is not annotated with any known expansion!");
     }
     
     private DocumentedVirtualMembers getVirtualMembers(TypeElement typeElement, AbstractTypeInfo expandedType) {
