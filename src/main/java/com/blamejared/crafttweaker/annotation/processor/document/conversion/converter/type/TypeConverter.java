@@ -2,34 +2,24 @@ package com.blamejared.crafttweaker.annotation.processor.document.conversion.con
 
 import com.blamejared.crafttweaker.annotation.processor.document.DocumentRegistry;
 import com.blamejared.crafttweaker.annotation.processor.document.NativeConversionRegistry;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.ArrayConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.JavaFunctionConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.JavaLangConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.NamedTypeConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.NativeTypeConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.NullableAnnotatedParameterConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.PrimitiveConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.PrimitiveWrapperParameterConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.TypeParameterConversionRule;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.VoidConversionRule;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.*;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.generic.GenericTypeConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.type.rules.generic.MapConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.document.page.info.TypeName;
 import com.blamejared.crafttweaker.annotation.processor.document.page.info.TypePageInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.AbstractTypeInfo;
+import com.blamejared.crafttweaker.annotation.processor.document.page.type.ExistingTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.GenericTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.document.page.type.TypePageTypeInfo;
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.DependencyContainer;
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.IHasPostCreationCall;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.rules.GenericConversionRule;
+import io.toolisticon.aptk.tools.MessagerUtils;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.type.TypeMirror;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import javax.tools.Diagnostic;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -64,7 +54,10 @@ public class TypeConverter implements IHasPostCreationCall {
         }
         
         //Problem: When preparing the ATIs we already convert the comments :thinking:
-        throw new UnsupportedOperationException("TODO: Unable to convert page: " + name.getZenCodeName() + " Make sure it has an @Document annotation!");
+        MessagerUtils.getMessager()
+                .printMessage(Diagnostic.Kind.WARNING, "Unable to convert page: '" + name.getZenCodeName() + "', replacing with a dummy link. Make sure it has an @Document annotation and doesn't link to any pages that don't have the annotation!");
+        return new ExistingTypeInfo(name.getZenCodeName());
+        //        throw new UnsupportedOperationException("TODO: Unable to convert page: " + name.getZenCodeName() + " Make sure it has an @Document annotation!");
     }
     
     private AbstractTypeInfo getGeneric(TypeName name) {
