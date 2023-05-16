@@ -1,11 +1,14 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.validator.rules;
 
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.ExpansionInfo;
+import io.toolisticon.aptk.tools.ElementUtils;
+import io.toolisticon.aptk.tools.TypeUtils;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
@@ -50,7 +53,14 @@ public class FirstParameterValidationRule extends AbstractGeneralValidationRule 
     
     private boolean isSecondParameterSubTypeOfFirst(TypeMirror expandedType, TypeMirror methodParameter) {
         
-        return typeUtils.isSubtype(expandedType, methodParameter);
+        // This gets rid of the explicit type params, Foo<Bar> gets turned into Foo
+        TypeElement expanded = TypeUtils.TypeRetrieval.getTypeElement(expandedType);
+        TypeElement parameter = TypeUtils.TypeRetrieval.getTypeElement(methodParameter);
+        if(expanded == null || parameter == null) {
+            return typeUtils.isSubtype(expandedType, methodParameter);
+        }
+        
+        return TypeUtils.TypeComparison.isAssignableTo(expanded, parameter);
     }
     
 }
