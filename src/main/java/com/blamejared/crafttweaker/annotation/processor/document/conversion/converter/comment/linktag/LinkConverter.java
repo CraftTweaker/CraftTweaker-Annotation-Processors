@@ -2,6 +2,7 @@ package com.blamejared.crafttweaker.annotation.processor.document.conversion.con
 
 
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.rules.ElementLinkConversionRule;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.rules.FunctionalInterfaceRule;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.rules.ImportedTypeLinkConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.rules.QualifiedNameLinkConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.comment.linktag.rules.ThisTypeConversionRule;
@@ -50,6 +51,7 @@ public class LinkConverter implements IHasPostCreationCall {
         addConversionRule(ThisTypeConversionRule.class);
         addConversionRule(ImportedTypeLinkConversionRule.class);
         addConversionRule(QualifiedNameLinkConversionRule.class);
+        addConversionRule(FunctionalInterfaceRule.class);
     }
     
     private void addConversionRule(Class<? extends LinkConversionRule> ruleClass) {
