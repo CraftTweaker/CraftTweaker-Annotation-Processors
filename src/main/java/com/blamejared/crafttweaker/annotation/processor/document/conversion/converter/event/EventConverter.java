@@ -1,5 +1,4 @@
-package com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.native_registration;
-
+package com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.event;
 
 import com.blamejared.crafttweaker.annotation.processor.document.NativeConversionRegistry;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.DocumentConverter;
@@ -29,7 +28,7 @@ import javax.lang.model.util.Types;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NativeRegistrationConverter extends DocumentConverter {
+public class EventConverter extends DocumentConverter {
     
     private final StaticMemberConverter staticMemberConverter;
     private final NativeTypeVirtualMemberConverter virtualMemberConverter;
@@ -41,7 +40,7 @@ public class NativeRegistrationConverter extends DocumentConverter {
     private final ClassTypeConverter classTypeConverter;
     private final EnumConstantConverter enumConstantConverter;
     
-    public NativeRegistrationConverter(KnownModList knownModList, CommentConverter commentConverter, StaticMemberConverter staticMemberConverter, NativeTypeVirtualMemberConverter virtualMemberConverter, SuperTypeConverter superTypeConverter, ImplementationConverter implementationConverter, GenericParameterConverter genericParameterConverter, NativeConversionRegistry nativeConversionRegistry, Types typeUtils, ClassTypeConverter classTypeConverter, EnumConstantConverter enumConstantConverter) {
+    public EventConverter(KnownModList knownModList, CommentConverter commentConverter, StaticMemberConverter staticMemberConverter, NativeTypeVirtualMemberConverter virtualMemberConverter, SuperTypeConverter superTypeConverter, ImplementationConverter implementationConverter, GenericParameterConverter genericParameterConverter, NativeConversionRegistry nativeConversionRegistry, Types typeUtils, ClassTypeConverter classTypeConverter, EnumConstantConverter enumConstantConverter) {
         
         super(knownModList, commentConverter);
         this.staticMemberConverter = staticMemberConverter;
@@ -58,7 +57,7 @@ public class NativeRegistrationConverter extends DocumentConverter {
     @Override
     public boolean canConvert(TypeElement typeElement) {
         
-        return getNativeAnnotation(typeElement) != null && !ZenEventWrapper.isAnnotated(typeElement);
+        return getNativeAnnotation(typeElement) != null && ZenEventWrapper.isAnnotated(typeElement);
     }
     
     private NativeTypeRegistrationWrapper getNativeAnnotation(TypeElement typeElement) {
@@ -131,13 +130,7 @@ public class NativeRegistrationConverter extends DocumentConverter {
         final List<AbstractTypeInfo> implementedInterfaces = convertImplementedInterfaces(typeElement);
         final DocumentedStaticMembers staticMembers = convertStaticMembers(typeElement, pageInfo);
         final List<DocumentedGenericParameter> genericParameters = convertGenericParameters(typeElement);
-        if(isNativeEnum(typeElement)) {
-            DocumentedEnumConstants enumConstants = new DocumentedEnumConstants(getName(typeElement));
-            convertNativeEnumMembers(typeElement, enumConstants);
-            return new EnumTypePage((TypePageInfo) pageInfo, virtualMembers, superType, implementedInterfaces, staticMembers, genericParameters, enumConstants);
-        } else {
-            return new TypePage((TypePageInfo) pageInfo, virtualMembers, superType, implementedInterfaces, staticMembers, genericParameters);
-        }
+        return new EventPage((TypePageInfo) pageInfo, virtualMembers, superType, implementedInterfaces, staticMembers, genericParameters);
     }
     
     protected DocumentedVirtualMembers convertVirtualMembers(TypeElement typeElement, DocumentationPageInfo pageInfo) {
