@@ -1,7 +1,8 @@
 package com.blamejared.crafttweaker.annotation.processor.document.conversion.converter;
 
 import com.blamejared.crafttweaker.annotation.processor.document.DocumentRegistry;
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.event.EventConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.event.NamedEventConverter;
+import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.event.NativeEventConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.expansion.ExpansionConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.named_type.NamedTypeConverter;
 import com.blamejared.crafttweaker.annotation.processor.document.conversion.converter.native_registration.NativeRegistrationConverter;
@@ -24,7 +25,8 @@ public class DocumentConversionRegistry {
         this.documentRegistry = documentRegistry;
         //
         // TODO: Add converters
-        converters.add((dependencyContainer.getInstanceOfClass(EventConverter.class)));
+        converters.add((dependencyContainer.getInstanceOfClass(NativeEventConverter.class)));
+        converters.add((dependencyContainer.getInstanceOfClass(NamedEventConverter.class)));
         converters.add(dependencyContainer.getInstanceOfClass(NativeRegistrationConverter.class));
         converters.add(dependencyContainer.getInstanceOfClass(ExpansionConverter.class));
         converters.add(dependencyContainer.getInstanceOfClass(NamedTypeConverter.class));

@@ -28,7 +28,7 @@ import javax.lang.model.util.Types;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EventConverter extends DocumentConverter {
+public class NativeEventConverter extends DocumentConverter {
     
     private final StaticMemberConverter staticMemberConverter;
     private final NativeTypeVirtualMemberConverter virtualMemberConverter;
@@ -40,7 +40,7 @@ public class EventConverter extends DocumentConverter {
     private final ClassTypeConverter classTypeConverter;
     private final EnumConstantConverter enumConstantConverter;
     
-    public EventConverter(KnownModList knownModList, CommentConverter commentConverter, StaticMemberConverter staticMemberConverter, NativeTypeVirtualMemberConverter virtualMemberConverter, SuperTypeConverter superTypeConverter, ImplementationConverter implementationConverter, GenericParameterConverter genericParameterConverter, NativeConversionRegistry nativeConversionRegistry, Types typeUtils, ClassTypeConverter classTypeConverter, EnumConstantConverter enumConstantConverter) {
+    public NativeEventConverter(KnownModList knownModList, CommentConverter commentConverter, StaticMemberConverter staticMemberConverter, NativeTypeVirtualMemberConverter virtualMemberConverter, SuperTypeConverter superTypeConverter, ImplementationConverter implementationConverter, GenericParameterConverter genericParameterConverter, NativeConversionRegistry nativeConversionRegistry, Types typeUtils, ClassTypeConverter classTypeConverter, EnumConstantConverter enumConstantConverter) {
         
         super(knownModList, commentConverter);
         this.staticMemberConverter = staticMemberConverter;
