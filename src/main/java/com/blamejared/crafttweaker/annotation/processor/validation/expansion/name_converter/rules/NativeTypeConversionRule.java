@@ -1,9 +1,9 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.rules;
 
-import com.blamejared.crafttweaker.annotation.processor.document.conversion.element.ClassTypeConverter;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.KnownTypeRegistry;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConversionRule;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistrationWrapper;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.TypeElement;
@@ -13,12 +13,10 @@ import java.util.function.Predicate;
 public class NativeTypeConversionRule implements NameConversionRule {
     
     private final KnownTypeRegistry knownTypeRegistry;
-    private final ClassTypeConverter classTypeConverter;
     
-    public NativeTypeConversionRule(KnownTypeRegistry knownTypeRegistry, ClassTypeConverter classTypeConverter) {
+    public NativeTypeConversionRule(KnownTypeRegistry knownTypeRegistry) {
         
         this.knownTypeRegistry = knownTypeRegistry;
-        this.classTypeConverter = classTypeConverter;
     }
     
     @Nullable
@@ -34,8 +32,11 @@ public class NativeTypeConversionRule implements NameConversionRule {
     
     private TypeMirror getExpandedType(TypeElement typeElement) {
         
-        final NativeTypeRegistration annotation = typeElement.getAnnotation(NativeTypeRegistration.class);
-        return classTypeConverter.getTypeMirror(annotation, NativeTypeRegistration::value);
+        NativeTypeRegistrationWrapper wrap = NativeTypeRegistrationWrapper.wrap(typeElement);
+        if(wrap == null) {
+            throw new IllegalStateException("Expected '" + typeElement + "' to have an @NativeTypeRegistration but it did not");
+        }
+        return wrap.valueAsTypeMirror();
     }
     
     

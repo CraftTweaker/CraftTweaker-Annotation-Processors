@@ -1,22 +1,19 @@
 package com.blamejared.crafttweaker.annotation.processor;
 
-import com.blamejared.crafttweaker.annotation.processor.util.annotations.AnnotationMirrorUtil;
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.DependencyContainer;
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.SingletonDependencyContainer;
+import io.toolisticon.aptk.common.ToolingProvider;
 import io.toolisticon.aptk.tools.AbstractAnnotationProcessor;
+import io.toolisticon.aptk.tools.ProcessingEnvironmentUtils;
 
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +33,7 @@ public abstract class CraftTweakerProcessor extends AbstractAnnotationProcessor 
     public final synchronized void init(ProcessingEnvironment processingEnv) {
         
         try {
+            ToolingProvider.setTooling(processingEnv);
             super.init(processingEnv);
             setupDependencyContainer();
             performInitialization();
@@ -62,8 +60,18 @@ public abstract class CraftTweakerProcessor extends AbstractAnnotationProcessor 
         if(!initializedCorrectly) {
             return false;
         }
+        Instant start = Instant.now();
         
-        return performProcessing(annotations, roundEnv);
+        boolean b = performProcessing(annotations, roundEnv);
+        
+        String duration = Duration.between(start, Instant.now()).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
+        ProcessingEnvironmentUtils.getMessager()
+                .printMessage(Diagnostic.Kind.NOTE, "(" + this.getClass()
+                        .getSimpleName() + ") Processing took: " + duration);
+        return b;
     }
     
     public abstract Collection<Class<? extends Annotation>> getSupportedAnnotationClasses();
@@ -83,37 +91,6 @@ public abstract class CraftTweakerProcessor extends AbstractAnnotationProcessor 
     protected void setupDependencyContainer() {
         
         dependencyContainer.addInstanceAs(dependencyContainer, DependencyContainer.class);
-        dependencyContainer.addInstanceAs(processingEnv, ProcessingEnvironment.class);
-        dependencyContainer.addInstanceAs(processingEnv.getMessager(), Messager.class);
-        dependencyContainer.addInstanceAs(processingEnv.getElementUtils(), Elements.class);
-        dependencyContainer.addInstanceAs(processingEnv.getTypeUtils(), Types.class);
-        dependencyContainer.addInstanceAs(new AnnotationMirrorUtil(), AnnotationMirrorUtil.class);
     }
-    
-    protected Messager messager() {
-        
-        return processingEnv.getMessager();
-    }
-    
-    protected void error(CharSequence msg) {
-        
-        this.messager().printMessage(Diagnostic.Kind.ERROR, msg);
-    }
-    
-    protected void error(CharSequence msg, Element e) {
-        
-        this.messager().printMessage(Diagnostic.Kind.ERROR, msg, e);
-    }
-    
-    protected void error(CharSequence msg, Element e, AnnotationMirror a) {
-        
-        this.messager().printMessage(Diagnostic.Kind.ERROR, msg, e, a);
-    }
-    
-    protected void error(CharSequence msg, Element e, AnnotationMirror a, AnnotationValue v) {
-        
-        this.messager().printMessage(Diagnostic.Kind.ERROR, msg, e, a, v);
-    }
-    
     
 }

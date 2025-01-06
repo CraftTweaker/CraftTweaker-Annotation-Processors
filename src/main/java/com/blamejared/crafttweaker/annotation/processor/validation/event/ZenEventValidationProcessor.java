@@ -16,8 +16,6 @@ import java.util.Set;
 @AutoService(Processor.class)
 public class ZenEventValidationProcessor extends CraftTweakerProcessor {
     
-    private ZenEventValidator virtualTypeValidator;
-    
     @Override
     public Collection<Class<? extends Annotation>> getSupportedAnnotationClasses() {
         
@@ -25,15 +23,9 @@ public class ZenEventValidationProcessor extends CraftTweakerProcessor {
     }
     
     @Override
-    public synchronized void performInitialization() {
-        
-        virtualTypeValidator = dependencyContainer.getInstanceOfClass(ZenEventValidator.class);
-    }
-    
-    @Override
     public boolean performProcessing(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         
-        virtualTypeValidator.validateAll(roundEnv.getElementsAnnotatedWithAny(Set.of(ZenEvent.class, ZenEvent.BusCarrier.class)));
+        ZenEventValidator.INSTANCE.validateAll(roundEnv.getElementsAnnotatedWithAny(Set.of(ZenEvent.class, ZenEvent.BusCarrier.class)));
         return false;
     }
     

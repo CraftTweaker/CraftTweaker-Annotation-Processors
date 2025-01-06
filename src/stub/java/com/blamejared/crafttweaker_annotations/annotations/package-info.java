@@ -1,8 +1,11 @@
 @AnnotationWrapper(value = {
         BracketEnum.class,
         Document.class,
+        Document.Mod.class,
         NativeConstructor.class,
+        NativeConstructor.ConstructorParameter.class,
         NativeMethod.class,
+        NativeMethod.Holder.class,
         NativeTypeRegistration.class,
         TaggableElement.class,
         TypedExpansion.class

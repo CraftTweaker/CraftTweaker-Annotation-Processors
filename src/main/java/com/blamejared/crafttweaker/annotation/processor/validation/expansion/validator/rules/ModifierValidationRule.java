@@ -1,22 +1,19 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.validator.rules;
 
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.ExpansionInfo;
+import io.toolisticon.aptk.tools.MessagerUtils;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import javax.tools.Diagnostic;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ModifierValidationRule extends AbstractGeneralValidationRule {
     
     private final Set<Modifier> requiredModifiers = new HashSet<>();
-    private final Messager messager;
     
-    public ModifierValidationRule(Messager messager) {
+    public ModifierValidationRule() {
         
-        this.messager = messager;
         fillRequiredModifiers();
     }
     
@@ -24,7 +21,7 @@ public class ModifierValidationRule extends AbstractGeneralValidationRule {
     public void validate(Element enclosedElement, ExpansionInfo expansionInfo) {
         
         if(hasIncorrectModifiers(enclosedElement)) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "Expansion members need to be public and static", enclosedElement);
+            MessagerUtils.error(enclosedElement, "Expansion members need to be public and static");
         }
     }
     

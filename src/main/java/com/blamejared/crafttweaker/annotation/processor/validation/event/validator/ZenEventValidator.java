@@ -1,8 +1,6 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.event.validator;
 
-
-import com.blamejared.crafttweaker.annotation.processor.util.dependencies.DependencyContainer;
-import com.blamejared.crafttweaker.annotation.processor.util.dependencies.IHasPostCreationCall;
+import com.blamejared.crafttweaker.annotation.processor.util.Util;
 import com.blamejared.crafttweaker.annotation.processor.validation.event.validator.rules.CancelableEventRule;
 import com.blamejared.crafttweaker.annotation.processor.validation.event.validator.rules.ZenEventHasBusRule;
 import com.blamejared.crafttweaker.annotation.processor.validation.event.validator.rules.ZenEventValidationRule;
@@ -15,15 +13,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ZenEventValidator implements IHasPostCreationCall {
+public class ZenEventValidator {
     
-    private final List<ZenEventValidationRule> rules = new ArrayList<>();
-    private final DependencyContainer dependencyContainer;
+    public static final ZenEventValidator INSTANCE = new ZenEventValidator();
     
-    public ZenEventValidator(DependencyContainer dependencyContainer) {
-        
-        this.dependencyContainer = dependencyContainer;
-    }
+    private final List<ZenEventValidationRule> rules = Util.make(new ArrayList<>(), list -> {
+        list.add(new ZenEventHasBusRule());
+        list.add(new CancelableEventRule());
+    });
+    
+    private ZenEventValidator() {}
     
     public void validateAll(Collection<? extends Element> elements) {
         
@@ -49,17 +48,5 @@ public class ZenEventValidator implements IHasPostCreationCall {
         }
     }
     
-    @Override
-    public void afterCreation() {
-        
-        addRule(ZenEventHasBusRule.class);
-        addRule(CancelableEventRule.class);
-    }
-    
-    public void addRule(Class<? extends ZenEventValidationRule> ruleClass) {
-        
-        final ZenEventValidationRule rule = dependencyContainer.getInstanceOfClass(ruleClass);
-        rules.add(rule);
-    }
     
 }

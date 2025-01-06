@@ -1,13 +1,12 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.validator.rules;
 
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.ExpansionInfo;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +17,10 @@ import java.util.stream.IntStream;
 
 public class ParameterCountValidationRule implements ExpansionInfoValidationRule {
     
-    private final Messager messager;
     private final Map<Class<? extends Annotation>, Integer> methodAnnotationToParameterCount = new HashMap<>();
     
-    public ParameterCountValidationRule(Messager messager) {
+    public ParameterCountValidationRule() {
         
-        this.messager = messager;
         fillParameterMap();
     }
     
@@ -72,7 +69,7 @@ public class ParameterCountValidationRule implements ExpansionInfoValidationRule
         
         return expectedCount -> {
             final String format = "Expected %s parameters for this Expansion Method";
-            messager.printMessage(Diagnostic.Kind.ERROR, String.format(format, expectedCount), enclosedElement);
+            MessagerUtils.error(enclosedElement, String.format(format, expectedCount));
         };
     }
     

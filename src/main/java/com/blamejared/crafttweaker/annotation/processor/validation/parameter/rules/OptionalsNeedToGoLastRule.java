@@ -1,11 +1,10 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.parameter.rules;
 
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
@@ -14,8 +13,6 @@ import java.util.function.Predicate;
 
 
 public class OptionalsNeedToGoLastRule implements ParameterValidationRule {
-    
-    private final Messager messager;
     
     private final Set<Class<? extends Annotation>> optionalAnnotations = new HashSet<>();
     {
@@ -27,11 +24,6 @@ public class OptionalsNeedToGoLastRule implements ParameterValidationRule {
         optionalAnnotations.add(ZenCodeType.OptionalDouble.class);
         optionalAnnotations.add(ZenCodeType.OptionalBoolean.class);
         optionalAnnotations.add(ZenCodeType.OptionalChar.class);
-    }
-    
-    public OptionalsNeedToGoLastRule(Messager messager) {
-        
-        this.messager = messager;
     }
     
     @Override
@@ -54,7 +46,7 @@ public class OptionalsNeedToGoLastRule implements ParameterValidationRule {
     public void validate(VariableElement parameter) {
         
         if(hasNonOptionalParameterFollowing(parameter)) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "Optional parameters must go last", parameter);
+            MessagerUtils.error(parameter, "Optional parameters must go last");
         }
     }
     

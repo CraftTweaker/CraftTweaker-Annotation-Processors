@@ -1,14 +1,10 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.event.validator.rules;
 
+import com.blamejared.crafttweaker.annotation.processor.util.Tools;
 import com.blamejared.crafttweaker.annotation.processor.validation.event.validator.visitors.CancelableTreeVisitor;
 import com.blamejared.crafttweaker.api.event.BusCarrierWrapper;
 import com.blamejared.crafttweaker.api.event.BusWrapper;
 import com.blamejared.crafttweaker.api.event.ZenEventWrapper;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.SimpleTreeVisitor;
 import io.toolisticon.aptk.tools.ElementUtils;
 import io.toolisticon.aptk.tools.MessagerUtils;
 import io.toolisticon.aptk.tools.ProcessingEnvironmentUtils;
@@ -25,7 +21,6 @@ public class CancelableEventRule implements ZenEventValidationRule {
     @Override
     public boolean canValidate(TypeElement enclosedElement) {
         
-        
         return (ZenEventWrapper.isAnnotated(enclosedElement) || BusCarrierWrapper.isAnnotated(enclosedElement))
                 && ElementUtils.AccessEnclosedElements.getEnclosedFields(enclosedElement)
                 .stream()
@@ -40,16 +35,19 @@ public class CancelableEventRule implements ZenEventValidationRule {
     @Override
     public void validate(TypeElement enclosedElement) {
         
-        ElementUtils.AccessEnclosedElements.getEnclosedFields(enclosedElement)
+        if(!isCancelable(enclosedElement)) {
+            MessagerUtils.error(enclosedElement, "@Cancelable event is not implemented as cancelable! Use 'IEventBus.cancelable' instead!");
+        }
+    }
+    
+    public static boolean isCancelable(TypeElement element) {
+        
+        return ElementUtils.AccessEnclosedElements.getEnclosedFields(element)
                 .stream()
-                .filter(BusWrapper::isAnnotated).forEach(variableElement -> {
-                    Tree tree = ProcessingEnvironmentUtils.getTrees().getTree(variableElement);
-                    Boolean cancelable = tree.accept(new CancelableTreeVisitor(), null);
-                    if(!cancelable) {
-                        MessagerUtils.error(enclosedElement, "@Cancelable event is not implemented as cancelable! Use 'IEventBus.cancelable' instead!");
-                    }
-                    
-                });
+                .filter(BusWrapper::isAnnotated)
+                .anyMatch(variableElement -> Tools.TREES.apply(ProcessingEnvironmentUtils.getProcessingEnvironment())
+                        .getTree(variableElement)
+                        .accept(CancelableTreeVisitor.INSTANCE, null));
     }
     
 }

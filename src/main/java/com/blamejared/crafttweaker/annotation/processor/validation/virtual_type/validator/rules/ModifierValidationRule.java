@@ -1,15 +1,13 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.virtual_type.validator.rules;
 
 import com.blamejared.crafttweaker.annotation.processor.util.Util;
-import com.blamejared.crafttweaker.annotation.processor.util.annotations.AnnotationMirrorUtil;
+import io.toolisticon.aptk.tools.AnnotationUtils;
 import io.toolisticon.aptk.tools.ElementUtils;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
-import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,8 +16,6 @@ import java.util.stream.Stream;
 
 public class ModifierValidationRule implements VirtualTypeValidationRule {
     
-    private final Messager messager;
-    private final AnnotationMirrorUtil annotationMirrorUtil;
     private final Set<Class<? extends Annotation>> checkedAnnotations = Util.make(new HashSet<>(), set -> {
         set.add(ZenCodeType.Method.class);
         set.add(ZenCodeType.Constructor.class);
@@ -33,12 +29,6 @@ public class ModifierValidationRule implements VirtualTypeValidationRule {
         set.add(ZenCodeType.Caster.class);
         set.add(ZenCodeType.Constructor.class);
     });
-    
-    public ModifierValidationRule(Messager messager, AnnotationMirrorUtil annotationMirrorUtil) {
-        
-        this.messager = messager;
-        this.annotationMirrorUtil = annotationMirrorUtil;
-    }
     
     @Override
     public boolean canValidate(Element enclosedElement) {
@@ -70,12 +60,12 @@ public class ModifierValidationRule implements VirtualTypeValidationRule {
     public void validate(Element enclosedElement) {
         
         if(notPublic(enclosedElement)) {
-            messager.printMessage(Diagnostic.Kind.ERROR, "All exposed members must be public", enclosedElement);
+            MessagerUtils.error(enclosedElement, "All exposed members must be public");
         }
         if(notVirtual(enclosedElement)) {
             getVirtualOnlyMirror(enclosedElement).forEach(mirror -> {
-                final String message = "Annotation requires instance member";
-                messager.printMessage(Diagnostic.Kind.ERROR, message, enclosedElement, mirror);
+                final String message = String.format("Annotation '%s' requires instance member", mirror);
+                MessagerUtils.error(enclosedElement, message);
             });
         }
     }
@@ -99,7 +89,7 @@ public class ModifierValidationRule implements VirtualTypeValidationRule {
         
         return virtualOnlyAnnotations.stream()
                 .filter(annotationPresentOn(typeElement))
-                .map(annotation -> annotationMirrorUtil.getMirror(typeElement, annotation));
+                .map(annotation -> AnnotationUtils.getAnnotationMirror(typeElement, annotation));
     }
     
 }

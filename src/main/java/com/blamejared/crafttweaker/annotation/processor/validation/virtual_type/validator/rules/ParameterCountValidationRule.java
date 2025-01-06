@@ -1,16 +1,13 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.virtual_type.validator.rules;
 
-import com.blamejared.crafttweaker.annotation.processor.util.Pair;
 import com.blamejared.crafttweaker.annotation.processor.util.Util;
-import io.toolisticon.aptk.tools.AnnotationValueUtils;
+import com.mojang.datafixers.util.Pair;
 import io.toolisticon.aptk.tools.ElementUtils;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,17 +17,11 @@ import java.util.stream.Stream;
 
 public class ParameterCountValidationRule implements VirtualTypeValidationRule {
     
-    private final Messager messager;
     private final Map<Class<? extends Annotation>, Integer> methodAnnotationToParameterCount = Util.make(new HashMap<>(), map -> {
         map.put(ZenCodeType.Getter.class, 0);
         map.put(ZenCodeType.Setter.class, 1);
         map.put(ZenCodeType.Caster.class, 0);
     });
-    
-    public ParameterCountValidationRule(Messager messager) {
-        
-        this.messager = messager;
-    }
     
     @Override
     public boolean canValidate(Element enclosedElement) {
@@ -43,7 +34,7 @@ public class ParameterCountValidationRule implements VirtualTypeValidationRule {
         
         final int parameterCount = getParameterCount(enclosedElement);
         this.expectedParameterCountsFor(enclosedElement)
-                .filter(classIntegerPair -> classIntegerPair.second() != parameterCount)
+                .filter(classIntegerPair -> classIntegerPair.getSecond() != parameterCount)
                 .forEach(logErrorMessage(enclosedElement, parameterCount));
     }
     
@@ -65,8 +56,9 @@ public class ParameterCountValidationRule implements VirtualTypeValidationRule {
         
         return annotationData -> {
             final String format = "Expected '%s' parameter%s for %s method but received '%s'";
-            messager.printMessage(Diagnostic.Kind.ERROR, format.formatted(annotationData.second(), annotationData.second() != 1 ? "s" : "", annotationData.first()
-                    .getSimpleName(), givenParams), enclosedElement);
+            final String msg = format.formatted(annotationData.getSecond(), annotationData.getSecond() != 1 ? "s" : "", annotationData.getFirst()
+                    .getSimpleName(), givenParams);
+            MessagerUtils.error(enclosedElement, msg);
         };
     }
     

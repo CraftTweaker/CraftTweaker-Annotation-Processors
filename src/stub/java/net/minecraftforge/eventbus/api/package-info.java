@@ -1,5 +1,6 @@
 @AnnotationWrapper(value = {
-        Cancelable.class
+        Cancelable.class,
+        Event.HasResult.class
 }, usePublicVisibility = true)
 package net.minecraftforge.eventbus.api;
 

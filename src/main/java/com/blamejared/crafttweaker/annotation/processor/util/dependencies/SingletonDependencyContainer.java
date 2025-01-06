@@ -1,12 +1,16 @@
 package com.blamejared.crafttweaker.annotation.processor.util.dependencies;
 
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public class SingletonDependencyContainer implements DependencyContainer {
     
@@ -88,8 +92,8 @@ public class SingletonDependencyContainer implements DependencyContainer {
             final Object[] arguments = getArguments(constructor);
             return (Type) constructor.newInstance(arguments);
         } catch(Exception e) {
-            final Messager instanceOfClass = getInstanceOfClass(Messager.class);
-            instanceOfClass.printMessage(Diagnostic.Kind.ERROR, String.format("Exception when trying to use %s: %s", constructor, e));
+            MessagerUtils.getMessager()
+                    .printMessage(Diagnostic.Kind.ERROR, String.format("Exception when trying to use %s: %s", constructor, e));
             return null;
         }
     }

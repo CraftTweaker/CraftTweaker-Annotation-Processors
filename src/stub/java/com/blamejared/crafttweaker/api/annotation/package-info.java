@@ -1,6 +1,7 @@
 @AnnotationWrapper(value = {
         BracketResolver.class,
-        Preprocessor.class
+        Preprocessor.class,
+        ZenRegister.class
 }, usePublicVisibility = true)
 package com.blamejared.crafttweaker.api.annotation;
 

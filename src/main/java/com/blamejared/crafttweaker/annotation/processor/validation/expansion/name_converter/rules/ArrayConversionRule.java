@@ -2,19 +2,17 @@ package com.blamejared.crafttweaker.annotation.processor.validation.expansion.na
 
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConverter;
+import io.toolisticon.aptk.tools.TypeUtils;
 
 import javax.annotation.Nullable;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 
 public class ArrayConversionRule implements NameConversionRule {
     
-    private final Types typeUtils;
     private final NameConverter nameConverter;
     
-    public ArrayConversionRule(Types typeUtils, NameConverter nameConverter) {
+    public ArrayConversionRule(NameConverter nameConverter) {
         
-        this.typeUtils = typeUtils;
         this.nameConverter = nameConverter;
     }
     
@@ -36,7 +34,7 @@ public class ArrayConversionRule implements NameConversionRule {
     private TypeMirror getArrayType(String zenCodeName) {
         
         final TypeMirror componentType = getComponentType(zenCodeName);
-        return typeUtils.getArrayType(componentType);
+        return TypeUtils.getTypes().getArrayType(componentType);
     }
     
     private TypeMirror getComponentType(String zenCodeName) {

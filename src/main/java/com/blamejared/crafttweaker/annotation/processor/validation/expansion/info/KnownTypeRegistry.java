@@ -2,12 +2,12 @@ package com.blamejared.crafttweaker.annotation.processor.validation.expansion.in
 
 import com.blamejared.crafttweaker.annotation.processor.util.dependencies.IHasPostCreationCall;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
+import io.toolisticon.aptk.tools.TypeUtils;
 import org.openzen.zencode.java.ZenCodeType;
 import org.reflections.Reflections;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 
 public class KnownTypeRegistry implements IHasPostCreationCall {
     
-    private final Elements elementUtils;
     private final Reflections reflections;
     
     private final Collection<TypeElement> namedTypes = new HashSet<>();
@@ -29,9 +28,8 @@ public class KnownTypeRegistry implements IHasPostCreationCall {
     private final Collection<TypeElement> nativeTypesFromDependencies = new HashSet<>();
     private final Collection<TypeElement> namedTypesFromDependencies = new HashSet<>();
     
-    public KnownTypeRegistry(Elements elementUtils, Reflections reflections) {
+    public KnownTypeRegistry(Reflections reflections) {
         
-        this.elementUtils = elementUtils;
         this.reflections = reflections;
     }
     
@@ -66,7 +64,7 @@ public class KnownTypeRegistry implements IHasPostCreationCall {
         
         final Set<TypeElement> newList = toUpdate.stream()
                 .map(Object::toString)
-                .map(elementUtils::getTypeElement)
+                .map(TypeUtils.TypeRetrieval::getTypeElement)
                 .collect(Collectors.toSet());
         
         toUpdate.clear();
@@ -136,7 +134,7 @@ public class KnownTypeRegistry implements IHasPostCreationCall {
         final List<TypeElement> result = reflections.getTypesAnnotatedWith(annotationClass, true)
                 .stream()
                 .map(Class::getCanonicalName)
-                .map(elementUtils::getTypeElement)
+                .map(TypeUtils.TypeRetrieval::getTypeElement)
                 .toList();
         
         resultCollection.addAll(result);

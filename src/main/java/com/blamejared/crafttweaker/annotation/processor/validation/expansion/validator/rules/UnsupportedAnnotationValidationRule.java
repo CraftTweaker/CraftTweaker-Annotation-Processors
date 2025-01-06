@@ -1,13 +1,12 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.validator.rules;
 
-import com.blamejared.crafttweaker.annotation.processor.util.annotations.AnnotationMirrorUtil;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.ExpansionInfo;
+import io.toolisticon.aptk.tools.AnnotationUtils;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,17 +19,9 @@ public class UnsupportedAnnotationValidationRule implements ExpansionInfoValidat
     
     private final Set<Class<? extends Annotation>> unsupportedTypes = new HashSet<>();
     
-    
-    private final AnnotationMirrorUtil annotationMirrorUtil;
-    private final Messager messager;
-    
-    public UnsupportedAnnotationValidationRule(AnnotationMirrorUtil annotationMirrorUtil, Messager messager) {
-        
-        this.annotationMirrorUtil = annotationMirrorUtil;
-        this.messager = messager;
+    public UnsupportedAnnotationValidationRule() {
         
         fillUnsupportedAnnotations();
-        
     }
     
     @Override
@@ -54,14 +45,14 @@ public class UnsupportedAnnotationValidationRule implements ExpansionInfoValidat
     
     private Function<Class<? extends Annotation>, AnnotationMirror> getAnnotationMirrorAt(Element enclosedElement) {
         
-        return annotationClass -> annotationMirrorUtil.getMirror(enclosedElement, annotationClass);
+        return annotationClass -> AnnotationUtils.getAnnotationMirror(enclosedElement, annotationClass);
     }
     
     private Consumer<AnnotationMirror> writeMessage(Element enclosedElement) {
         
         return annotationMirror -> {
-            final String message = "Annotation not allowed in expansions";
-            messager.printMessage(Diagnostic.Kind.ERROR, message, enclosedElement, annotationMirror);
+            final String message = String.format("Annotation %s not allowed in expansions", annotationMirror);
+            MessagerUtils.error(enclosedElement, message);
         };
     }
     

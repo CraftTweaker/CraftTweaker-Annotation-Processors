@@ -2,12 +2,11 @@ package com.blamejared.crafttweaker.annotation.processor.validation.expansion.na
 
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConverter;
+import io.toolisticon.aptk.tools.TypeUtils;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -17,14 +16,10 @@ public class MapConversionRule implements NameConversionRule {
     
     private static final Pattern pattern = Pattern.compile("([^\\[]+)\\[([^]]+)]");
     
-    private final Elements elementUtils;
-    private final Types typeUtils;
     private final NameConverter nameConverter;
     
-    public MapConversionRule(Elements elementUtils, Types typeUtils, NameConverter nameConverter) {
+    public MapConversionRule(NameConverter nameConverter) {
         
-        this.elementUtils = elementUtils;
-        this.typeUtils = typeUtils;
         this.nameConverter = nameConverter;
     }
     
@@ -58,7 +53,7 @@ public class MapConversionRule implements NameConversionRule {
         final TypeMirror keyType = getMapKeyType(matchResult);
         final TypeMirror valueType = getMapValueType(matchResult);
         
-        return typeUtils.getDeclaredType(baseType, keyType, valueType);
+        return TypeUtils.getTypes().getDeclaredType(baseType, keyType, valueType);
     }
     
     private TypeMirror getMapKeyType(MatchResult matchResult) {
@@ -75,7 +70,7 @@ public class MapConversionRule implements NameConversionRule {
     
     private TypeElement getMapBaseType() {
         
-        return elementUtils.getTypeElement(Map.class.getCanonicalName());
+        return TypeUtils.TypeRetrieval.getTypeElement(Map.class);
     }
     
 }

@@ -1,53 +1,33 @@
 package com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.rules;
 
-
+import com.blamejared.crafttweaker.annotation.processor.util.Util;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConversionRule;
+import io.toolisticon.aptk.tools.TypeUtils;
 
 import javax.annotation.Nullable;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PrimitiveConversionRule implements NameConversionRule {
     
-    private final Map<String, TypeKind> primitiveTypes = new HashMap<>();
-    private final Types typeUtils;
-    private final Elements elementUtils;
-    
-    public PrimitiveConversionRule(Types typeUtils, Elements elementUtils) {
+    private static final Map<String, TypeKind> primitiveTypes = Util.make(new HashMap<>(), map -> {
+        // signed
+        map.put("bool", TypeKind.BOOLEAN);
+        map.put("byte", TypeKind.BYTE);
+        map.put("char", TypeKind.CHAR);
+        map.put("short", TypeKind.SHORT);
+        map.put("int", TypeKind.INT);
+        map.put("long", TypeKind.LONG);
+        map.put("float", TypeKind.FLOAT);
+        map.put("double", TypeKind.DOUBLE);
         
-        this.typeUtils = typeUtils;
-        this.elementUtils = elementUtils;
-        fillPrimitiveTypeMap();
-    }
-    
-    private void fillPrimitiveTypeMap() {
-        
-        fillSigned();
-        fillUnsigned();
-    }
-    
-    private void fillSigned() {
-        
-        primitiveTypes.put("bool", TypeKind.BOOLEAN);
-        primitiveTypes.put("byte", TypeKind.BYTE);
-        primitiveTypes.put("char", TypeKind.CHAR);
-        primitiveTypes.put("short", TypeKind.SHORT);
-        primitiveTypes.put("int", TypeKind.INT);
-        primitiveTypes.put("long", TypeKind.LONG);
-        primitiveTypes.put("float", TypeKind.FLOAT);
-        primitiveTypes.put("double", TypeKind.DOUBLE);
-    }
-    
-    private void fillUnsigned() {
-        
-        primitiveTypes.put("ushort", TypeKind.SHORT);
-        primitiveTypes.put("uint", TypeKind.INT);
-        primitiveTypes.put("ulong", TypeKind.LONG);
-    }
+        // unsigned
+        map.put("ushort", TypeKind.SHORT);
+        map.put("uint", TypeKind.INT);
+        map.put("ulong", TypeKind.LONG);
+    });
     
     @Nullable
     @Override
@@ -64,12 +44,12 @@ public class PrimitiveConversionRule implements NameConversionRule {
     private TypeMirror getString() {
         
         final String canonicalName = String.class.getCanonicalName();
-        return elementUtils.getTypeElement(canonicalName).asType();
+        return TypeUtils.TypeRetrieval.getTypeMirror(canonicalName);
     }
     
     private TypeMirror getMirrorFromClass(TypeKind kind) {
         
-        return typeUtils.getPrimitiveType(kind);
+        return TypeUtils.getTypes().getPrimitiveType(kind);
     }
     
 }

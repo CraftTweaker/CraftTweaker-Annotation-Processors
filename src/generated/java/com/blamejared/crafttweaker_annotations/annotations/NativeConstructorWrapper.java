@@ -76,6 +76,18 @@ public class NativeConstructorWrapper {
         return result.toArray(new AnnotationMirror[result.size()]);
     }
 
+    /**
+     * Gets the NativeConstructor.value from wrapped annotation.
+     * @return the attribute value
+     */
+    public ConstructorParameterWrapper[] value() {
+        List<ConstructorParameterWrapper> result = new ArrayList<>();
+        for(AnnotationValue value : (List<AnnotationValue>)AnnotationUtils.getAnnotationValueOfAttributeWithDefaults(annotationMirror, "value").getValue() ) {
+            result.add( ConstructorParameterWrapper.wrap(this.annotatedElement, (AnnotationMirror)value.getValue()));
+        }
+
+        return result.toArray(new ConstructorParameterWrapper[result.size()]);
+    }
 
 
 

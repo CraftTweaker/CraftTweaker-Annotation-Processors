@@ -3,10 +3,22 @@ package com.blamejared.crafttweaker.annotation.processor.validation.event.valida
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SimpleTreeVisitor;
 
 public class CancelableTreeVisitor extends SimpleTreeVisitor<Boolean, Void> {
+    
+    public static final CancelableTreeVisitor INSTANCE = new CancelableTreeVisitor();
+    
+    private CancelableTreeVisitor() {
+    
+    }
+    
+    public boolean visit(Tree tree) {
+        
+        return tree.accept(this, null);
+    }
     
     @Override
     public Boolean visitVariable(VariableTree node, Void object) {

@@ -2,11 +2,11 @@ package com.blamejared.crafttweaker.annotation.processor.validation.expansion.na
 
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConversionRule;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.name_converter.NameConverter;
+import io.toolisticon.aptk.tools.TypeUtils;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 import java.util.Arrays;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -16,12 +16,10 @@ public class GenericConversionRule implements NameConversionRule {
     
     public static final Pattern GENERIC_PATTERN = Pattern.compile("([^<]+)<(.+)>");
     
-    private final Types typeUtils;
     private final NameConverter nameConverter;
     
-    public GenericConversionRule(Types typeUtils, NameConverter nameConverter) {
+    public GenericConversionRule(NameConverter nameConverter) {
         
-        this.typeUtils = typeUtils;
         this.nameConverter = nameConverter;
     }
     
@@ -56,14 +54,14 @@ public class GenericConversionRule implements NameConversionRule {
         final TypeElement baseType = getBaseType(matchResult);
         final TypeMirror[] arguments = getTypeArguments(matchResult);
         
-        return typeUtils.getDeclaredType(baseType, arguments);
+        return TypeUtils.getTypes().getDeclaredType(baseType, arguments);
     }
     
     private TypeElement getBaseType(MatchResult matchResult) {
         
         final String baseTypeZenCodeName = matchResult.group(1).trim();
         final TypeMirror typeMirrorByZenCodeName = nameConverter.getTypeMirrorByZenCodeName(baseTypeZenCodeName);
-        return (TypeElement) typeUtils.asElement(typeMirrorByZenCodeName);
+        return TypeUtils.TypeRetrieval.getTypeElement(typeMirrorByZenCodeName);
     }
     
     private TypeMirror[] getTypeArguments(MatchResult matchResult) {

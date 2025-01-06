@@ -2,22 +2,14 @@ package com.blamejared.crafttweaker.annotation.processor.validation.expansion.va
 
 import com.blamejared.crafttweaker.annotation.processor.util.OperatorTypeParameterCountProvider;
 import com.blamejared.crafttweaker.annotation.processor.validation.expansion.info.ExpansionInfo;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.tools.Diagnostic;
 
 public class OperatorParameterCountValidationRule implements ExpansionInfoValidationRule {
-    
-    private final Messager messager;
-    
-    public OperatorParameterCountValidationRule(Messager messager) {
-        
-        this.messager = messager;
-    }
     
     @Override
     public boolean canValidate(Element enclosedElement) {
@@ -31,7 +23,7 @@ public class OperatorParameterCountValidationRule implements ExpansionInfoValida
         if(parameterCountInvalid(enclosedElement)) {
             final int expectedNumberOfParameters = getExpectedNumberOfParameters(enclosedElement);
             final String msg = String.format("This operator requires %s parameters", expectedNumberOfParameters);
-            messager.printMessage(Diagnostic.Kind.ERROR, msg, enclosedElement);
+            MessagerUtils.error(enclosedElement, msg);
         }
     }
     

@@ -2,24 +2,15 @@ package com.blamejared.crafttweaker.annotation.processor.validation.virtual_type
 
 import com.blamejared.crafttweaker.annotation.processor.util.OperatorTypeParameterCountProvider;
 import io.toolisticon.aptk.tools.ElementUtils;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import org.openzen.zencode.java.OperatorWrapper;
 import org.openzen.zencode.java.ZenCodeType;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.tools.Diagnostic;
 import java.util.Optional;
 
 public class OperatorParameterCountValidationRule implements VirtualTypeValidationRule {
-    
-    private final Messager messager;
-    
-    public OperatorParameterCountValidationRule(Messager messager) {
-        
-        this.messager = messager;
-    }
     
     @Override
     public boolean canValidate(Element enclosedElement) {
@@ -34,7 +25,7 @@ public class OperatorParameterCountValidationRule implements VirtualTypeValidati
         final ZenCodeType.OperatorType operatorType = getOperatorType(enclosedElement);
         final Optional<String> validationMessage = OperatorTypeParameterCountProvider.validateParameterCount(operatorType, actualNumberOfParameters);
         
-        validationMessage.ifPresent(msg -> messager.printMessage(Diagnostic.Kind.ERROR, msg, enclosedElement));
+        validationMessage.ifPresent(msg -> MessagerUtils.error(enclosedElement, msg));
     }
     
     private ZenCodeType.OperatorType getOperatorType(Element enclosedElement) {

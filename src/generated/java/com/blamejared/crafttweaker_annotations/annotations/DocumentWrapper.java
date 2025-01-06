@@ -1,5 +1,6 @@
 package com.blamejared.crafttweaker_annotations.annotations;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
+import com.blamejared.crafttweaker_annotations.annotations.Document.Mod;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -87,6 +88,42 @@ public class DocumentWrapper {
      */
     public boolean scriptFileIsDefaultValue(){
         return AnnotationUtils.getAnnotationValueOfAttribute(annotationMirror,"scriptFile") == null;
+    }
+
+    /**
+     * Gets the Document.requiredMods from wrapped annotation.
+     * @return the attribute value
+     */
+    public AnnotationMirror[] requiredModsAsAnnotationMirrorArray() {
+        List<AnnotationMirror> result = new ArrayList<>();
+        for(AnnotationValue value : (List<AnnotationValue>)AnnotationUtils.getAnnotationValueOfAttributeWithDefaults(annotationMirror, "requiredMods").getValue() ) {
+            result.add( ((AnnotationMirror)value.getValue()));
+        }
+
+        return result.toArray(new AnnotationMirror[result.size()]);
+    }
+
+    /**
+     * Gets the Document.requiredMods from wrapped annotation.
+     * @return the attribute value
+     */
+    public ModWrapper[] requiredMods() {
+        List<ModWrapper> result = new ArrayList<>();
+        for(AnnotationValue value : (List<AnnotationValue>)AnnotationUtils.getAnnotationValueOfAttributeWithDefaults(annotationMirror, "requiredMods").getValue() ) {
+            result.add( ModWrapper.wrap(this.annotatedElement, (AnnotationMirror)value.getValue()));
+        }
+
+        return result.toArray(new ModWrapper[result.size()]);
+    }
+
+
+
+    /**
+     * Allows to check if attribute was explicitly set or if default value is used.
+     * @return true, if default value is used, otherwise false
+     */
+    public boolean requiredModsIsDefaultValue(){
+        return AnnotationUtils.getAnnotationValueOfAttribute(annotationMirror,"requiredMods") == null;
     }
 
 

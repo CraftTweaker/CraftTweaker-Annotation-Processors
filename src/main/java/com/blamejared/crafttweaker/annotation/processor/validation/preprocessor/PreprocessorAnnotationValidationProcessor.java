@@ -4,6 +4,7 @@ import com.blamejared.crafttweaker.annotation.processor.CraftTweakerProcessor;
 import com.blamejared.crafttweaker.api.annotation.Preprocessor;
 import com.blamejared.crafttweaker.api.zencode.IPreprocessor;
 import com.google.auto.service.AutoService;
+import io.toolisticon.aptk.tools.MessagerUtils;
 import io.toolisticon.aptk.tools.TypeUtils;
 
 import javax.annotation.processing.Processor;
@@ -24,13 +25,12 @@ public class PreprocessorAnnotationValidationProcessor extends CraftTweakerProce
         for(TypeElement annotation : annotations) {
             for(Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
                 if(!(element instanceof TypeElement)) {
-                    this.messager().printMessage(Diagnostic.Kind.ERROR, "How is this annotated?", element);
+                    MessagerUtils.error(element, "How is this annotated?");
                     continue;
                 }
                 
                 if(!TypeUtils.TypeComparison.isAssignableTo(element.asType(), IPreprocessor.class)) {
-                    this.messager()
-                            .printMessage(Diagnostic.Kind.ERROR, "Element is annotated as Preprocessor but is not assignable to " + IPreprocessor.class.getCanonicalName() + "!", element);
+                    MessagerUtils.error(element, "Element is annotated as @Preprocessor but does not implement " + IPreprocessor.class.getCanonicalName() + "!");
                 }
                 //Not sure if the implicit no-arg constructor is already present here,
                 //so let's just check no other constructor was found
