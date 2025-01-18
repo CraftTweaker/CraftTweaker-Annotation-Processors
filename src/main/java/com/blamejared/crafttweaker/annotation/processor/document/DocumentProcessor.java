@@ -18,6 +18,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.model.member.Pa
 import com.blamejared.crafttweaker.annotation.processor.document.model.member.SetterMember;
 import com.blamejared.crafttweaker.annotation.processor.document.model.page.EnumPage;
 import com.blamejared.crafttweaker.annotation.processor.document.model.page.EventPage;
+import com.blamejared.crafttweaker.annotation.processor.document.model.page.ExpansionPage;
 import com.blamejared.crafttweaker.annotation.processor.document.model.page.PageVersion;
 import com.blamejared.crafttweaker.annotation.processor.document.model.page.TypePage;
 import com.blamejared.crafttweaker.annotation.processor.document.model.type.Type;
@@ -26,6 +27,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.visitor.Javadoc
 import com.blamejared.crafttweaker.annotation.processor.document.visitor.JavadocEventVisitor;
 import com.blamejared.crafttweaker.annotation.processor.document.visitor.TypeBuildingVisitor;
 import com.blamejared.crafttweaker.annotation.processor.document.visitor.TypeMembersVisitor;
+import com.blamejared.crafttweaker.annotation.processor.document.visitor.ZenCodeNameRetriever;
 import com.blamejared.crafttweaker.annotation.processor.util.Pairs;
 import com.blamejared.crafttweaker.annotation.processor.util.Tools;
 import com.blamejared.crafttweaker.annotation.processor.util.Util;
@@ -37,6 +39,7 @@ import com.blamejared.crafttweaker_annotations.annotations.NativeMethod;
 import com.blamejared.crafttweaker_annotations.annotations.NativeMethodWrapper;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistrationWrapper;
+import com.blamejared.crafttweaker_annotations.annotations.TypedExpansionWrapper;
 import com.google.auto.service.AutoService;
 import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
@@ -53,9 +56,11 @@ import io.toolisticon.aptk.common.ToolingProvider;
 import io.toolisticon.aptk.tools.ElementUtils;
 import io.toolisticon.aptk.tools.TypeMirrorWrapper;
 import io.toolisticon.aptk.tools.TypeUtils;
+import io.toolisticon.aptk.tools.wrapper.ElementWrapper;
 import io.toolisticon.aptk.tools.wrapper.TypeElementWrapper;
 import net.minecraftforge.eventbus.api.HasResultWrapper;
 import org.apache.commons.lang3.ArrayUtils;
+import org.openzen.zencode.java.ExpansionWrapper;
 import org.openzen.zencode.java.NameWrapper;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -198,10 +203,12 @@ public class DocumentProcessor extends CraftTweakerProcessor {
                     String[] pageParents = ArrayUtils.subarray(docPaths, 0, docPaths.length - 1);
                     boolean isName = NameWrapper.isAnnotated(typeElement);
                     boolean isNative = NativeTypeRegistrationWrapper.isAnnotated(typeElement);
+                    boolean isExpansion = ExpansionWrapper.isAnnotated(typeElement) || TypedExpansionWrapper.isAnnotated(typeElement);
                     
-                    if(isNative) {
+                    Optional<String> zenCodeName = ZenCodeNameRetriever.INSTANCE.visit(typeElement);
+                    if(isNative && zenCodeName.isPresent()) {
                         NativeTypeRegistrationWrapper nativeWrapper = Objects.requireNonNull(NativeTypeRegistrationWrapper.wrap(typeElement));
-                        String zenCodeName = nativeWrapper.zenCodeName();
+                        
                         TypeMirror expanded = nativeWrapper.valueAsTypeMirror();
                         Optional<Type> type = TypeBuildingVisitor.INSTANCE.visit(expanded, TypeBuildingVisitor.Context.VERBOSE);
                         
@@ -221,17 +228,18 @@ public class DocumentProcessor extends CraftTweakerProcessor {
                         TypeMembersVisitor.NativeTypeInfo info = new TypeMembersVisitor.NativeTypeInfo(typeElement, expanded, nativeConstructors, nativeMethods);
                         Map<String, MemberGroup> members = getMemberGroups(typeElement, superTypes, Optional.of(info));
                         
+                        
                         type.map(foundType -> {
                             if(Util.isEvent(typeElement)) {
-                                return createEventPage(typeElement, key, displayName, comment, extra, foundType, zenCodeName, members);
+                                return createEventPage(typeElement, key, displayName, comment, extra, foundType, zenCodeName.get(), members);
                             } else if(TypeMirrorWrapper.isEnum(expanded)) {
-                                return new EnumPage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName, members);
+                                return new EnumPage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName.get(), members);
                             } else {
-                                return new TypePage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName, members);
+                                return new TypePage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName.get(), members);
                             }
                         }).ifPresent(typePage -> DocFolder.ROOT.child(pageParents, typePage));
                     }
-                    if(isName) {
+                    if(isName && zenCodeName.isPresent()) {
                         NameWrapper nameWrapper = Objects.requireNonNull(NameWrapper.wrap(typeElement));
                         
                         Optional<Comment> comment = JavadocCommentsVisitor.visit(typeElement);
@@ -239,19 +247,50 @@ public class DocumentProcessor extends CraftTweakerProcessor {
                         typeElement.accept(ExtraVisitor.INSTANCE, extraContext);
                         Extra extra = extraContext.extra();
                         Optional<Type> type = TypeBuildingVisitor.INSTANCE.visit(typeElement.asType(), TypeBuildingVisitor.Context.VERBOSE);
-                        String zenCodeName = nameWrapper.value();
                         Map<String, MemberGroup> members = getMemberGroups(typeElement, Arrays.asList(ElementUtils.AccessTypeHierarchy.getSuperTypeElements(typeElement)), Optional.empty());
                         
                         type.map(foundType -> {
                             if(Util.isEvent(typeElement)) {
-                                return createEventPage(typeElement, key, displayName, comment, extra, foundType, zenCodeName, members);
+                                return createEventPage(typeElement, key, displayName, comment, extra, foundType, zenCodeName.get(), members);
                             } else if(ElementUtils.CheckKindOfElement.isEnum(typeElement)) {
-                                return new EnumPage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName, members);
+                                return new EnumPage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName.get(), members);
                             } else {
-                                return new TypePage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName, members);
+                                return new TypePage(PageVersion.ONE, key, displayName, comment, extra, foundType, zenCodeName.get(), members);
                             }
                         }).ifPresent(typePage -> DocFolder.ROOT.child(pageParents, typePage));
                         
+                    }
+                    
+                    if(isExpansion) {
+                        ExpansionWrapper exp = ExpansionWrapper.wrap(typeElement);
+                        TypedExpansionWrapper typ = TypedExpansionWrapper.wrap(typeElement);
+                        
+                        Optional<Comment> comment = JavadocCommentsVisitor.visit(typeElement);
+                        ExtraVisitor.Context extraContext = ExtraVisitor.Context.from(typeElement, Extra.EMPTY);
+                        typeElement.accept(ExtraVisitor.INSTANCE, extraContext);
+                        Extra extra = extraContext.extra();
+                        Optional<Type> type = TypeBuildingVisitor.INSTANCE.visit(typeElement.asType(), TypeBuildingVisitor.Context.VERBOSE);
+                        
+                        Optional<String> expandedName = Optional.empty();
+                        if(exp != null) {
+                            expandedName = Optional.ofNullable(exp.value());
+                        } else if(typ != null && typ.valueAsTypeMirrorWrapper().getTypeElement().isPresent()) {
+                            // First check if the value itself has a zenCodeName
+                            expandedName = ZenCodeNameRetriever.INSTANCE.visit(typ.valueAsTypeMirrorWrapper()
+                                    .getTypeElement()
+                                    .get()
+                                    .unwrap());
+                            // If it doesn't check if it is a NativeTypeRegistration class
+                            if(expandedName.isEmpty()) {
+                                expandedName = typ.valueAsTypeMirrorWrapper()
+                                        .getTypeElement()
+                                        .map(ElementWrapper::unwrap)
+                                        .map(typeElement1 -> nativeRegistry(roundEnvironment).inverse()
+                                                .get(typeElement1)).flatMap(ZenCodeNameRetriever.INSTANCE::visit);
+                            }
+                        }
+                        Map<String, MemberGroup> members = getMemberGroups(typeElement, Arrays.asList(ElementUtils.AccessTypeHierarchy.getSuperTypeElements(typeElement)), Optional.of(TypeMembersVisitor.ExpansionNativeTypeInfo.INSTANCE));
+                        DocFolder.ROOT.child(pageParents, new ExpansionPage(PageVersion.ONE, key, displayName, comment, extra, expandedName, members));
                     }
                 });
     }
@@ -278,7 +317,7 @@ public class DocumentProcessor extends CraftTweakerProcessor {
         return new EventPage(PageVersion.ONE, key, displayName, comment, extra, type, zenCodeName, members, context.canceledInfo(), context.notCanceledInfo(), context.allowInfo(), context.defaultInfo(), context.denyInfo(), hasResult, cancelable);
     }
     
-    private Map<String, MemberGroup> getMemberGroups(TypeElement typeElement, List<TypeElement> superTypes, Optional<TypeMembersVisitor.NativeTypeInfo> nativeInfo) {
+    private Map<String, MemberGroup> getMemberGroups(TypeElement typeElement, List<TypeElement> superTypes, Optional<TypeMembersVisitor.INativeInfo> nativeInfo) {
         
         TypeMembersVisitor.Context context = new TypeMembersVisitor.Context(typeElement, nativeInfo);
         

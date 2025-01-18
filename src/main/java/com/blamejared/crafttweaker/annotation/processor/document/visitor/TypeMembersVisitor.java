@@ -32,6 +32,7 @@ import io.toolisticon.aptk.tools.ElementUtils;
 import io.toolisticon.aptk.tools.TypeUtils;
 import io.toolisticon.aptk.tools.corematcher.AptkCoreMatchers;
 import io.toolisticon.aptk.tools.fluentfilter.FluentElementFilter;
+import org.jetbrains.annotations.Nullable;
 import org.openzen.zencode.java.CasterWrapper;
 import org.openzen.zencode.java.ConstructorWrapper;
 import org.openzen.zencode.java.FieldWrapper;
@@ -224,9 +225,9 @@ public class TypeMembersVisitor extends SimpleElementVisitor8<Map<String, List<M
     public static class Context {
         
         private final TypeElement owner;
-        private final Optional<NativeTypeInfo> nativeInfo;
+        private final Optional<INativeInfo> nativeInfo;
         
-        public Context(TypeElement owner, Optional<NativeTypeInfo> nativeInfo) {
+        public Context(TypeElement owner, Optional<INativeInfo> nativeInfo) {
             
             this.owner = owner;
             this.nativeInfo = nativeInfo;
@@ -237,14 +238,60 @@ public class TypeMembersVisitor extends SimpleElementVisitor8<Map<String, List<M
             return owner;
         }
         
-        public Optional<NativeTypeInfo> nativeInfo() {
+        public Optional<INativeInfo> nativeInfo() {
             
             return nativeInfo;
         }
         
     }
     
-    public static class NativeTypeInfo {
+    public static interface INativeInfo {
+        
+        @Nullable
+        TypeElement registeringTypeElement();
+        
+        @Nullable
+        TypeMirror expandedTypeMirror();
+        
+        List<NativeConstructorInfo> constructor();
+        
+        List<NativeMethodInfo> methods();
+        
+    }
+    
+    public static class ExpansionNativeTypeInfo implements INativeInfo {
+        
+        public static final ExpansionNativeTypeInfo INSTANCE = new ExpansionNativeTypeInfo();
+        
+        private ExpansionNativeTypeInfo() {}
+        
+        @Override
+        public @Nullable TypeElement registeringTypeElement() {
+            
+            return null;
+        }
+        
+        @Override
+        public @Nullable TypeMirror expandedTypeMirror() {
+            
+            return null;
+        }
+        
+        @Override
+        public List<NativeConstructorInfo> constructor() {
+            
+            return List.of();
+        }
+        
+        @Override
+        public List<NativeMethodInfo> methods() {
+            
+            return List.of();
+        }
+        
+    }
+    
+    public static class NativeTypeInfo implements INativeInfo {
         
         private final TypeElement registeringTypeElement;
         private final TypeMirror expandedTypeMirror;

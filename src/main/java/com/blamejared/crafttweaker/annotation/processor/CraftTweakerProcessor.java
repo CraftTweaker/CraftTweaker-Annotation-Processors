@@ -24,12 +24,6 @@ public abstract class CraftTweakerProcessor extends AbstractAnnotationProcessor 
     private boolean initializedCorrectly = false;
     
     @Override
-    public SourceVersion getSupportedSourceVersion() {
-        
-        return SourceVersion.RELEASE_17;
-    }
-    
-    @Override
     public final synchronized void init(ProcessingEnvironment processingEnv) {
         
         try {

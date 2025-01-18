@@ -11,7 +11,8 @@ public enum PageKind implements Keyable {
     EVENT("event", () -> EventPage.CODEC),
     ENUM("enum", () -> EnumPage.CODEC),
     MARKDOWN("markdown", () -> MarkdownPage.CODEC),
-    RENDERED("rendered", () -> RenderedPage.CODEC);
+    RENDERED("rendered", () -> RenderedPage.CODEC),
+    EXPANSION("expansion", () -> ExpansionPage.CODEC);
     
     public static final Codec<PageKind> CODEC = Codec.STRING.xmap(Util.enumLookup(PageKind.values()), PageKind::key);
     private final String key;
