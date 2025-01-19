@@ -337,6 +337,10 @@ public class ExtraVisitor implements ElementVisitor<Void, ExtraVisitor.Context>,
     @Override
     public Void visitType(TypeElement e, Context context) {
         
+        HTMLAwareJavadocDescription.parse(e).ifPresent(javadoc -> {
+            javadoc.accept(this, context);
+        });
+        
         Optionull.ifPresent(DocumentWrapper.wrap(e), DocumentWrapper::requiredMods, requiredMods -> {
             List<RequiredMods.Mod> mods = Arrays.stream(requiredMods)
                     .map(modWrapper -> new RequiredMods.Mod(modWrapper.modid(), modWrapper.displayName(), modWrapper.url()))
@@ -372,7 +376,6 @@ public class ExtraVisitor implements ElementVisitor<Void, ExtraVisitor.Context>,
     @Override
     public Void visitVariable(VariableElement e, Context context) {
         
-        //TODO read javadoc here
         HTMLAwareJavadocDescription.parse(e).ifPresent(javadoc -> {
             javadoc.accept(this, context);
         });
@@ -386,7 +389,6 @@ public class ExtraVisitor implements ElementVisitor<Void, ExtraVisitor.Context>,
     @Override
     public Void visitExecutable(ExecutableElement e, Context context) {
         
-        //TODO read javadoc here
         HTMLAwareJavadocDescription.parse(e).ifPresent(javadoc -> {
             javadoc.accept(this, context);
         });
