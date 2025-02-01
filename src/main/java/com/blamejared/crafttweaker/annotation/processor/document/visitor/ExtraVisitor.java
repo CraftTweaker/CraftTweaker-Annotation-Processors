@@ -55,7 +55,6 @@ import com.sun.source.util.Trees;
 import io.toolisticon.aptk.common.ToolingProvider;
 import io.toolisticon.aptk.tools.ElementUtils;
 import io.toolisticon.aptk.tools.ProcessingEnvironmentUtils;
-import io.toolisticon.aptk.tools.TypeMirrorWrapper;
 import net.minecraftforge.eventbus.api.Event;
 
 import javax.lang.model.element.Element;
@@ -524,11 +523,9 @@ public class ExtraVisitor implements ElementVisitor<Void, ExtraVisitor.Context>,
                             .toString());
                 }
                 
-                String pkg = TypeMirrorWrapper.getPackage(element.asType());
-                if(pkg == null) {
-                    pkg = TypeMirrorWrapper.getPackage(element.getEnclosingElement().asType());
-                }
-                return new ExtraVisitor.Context(Optional.ofNullable(pkg), imports, extra);
+                Optional<String> pkg = Util.getPackageName(element.asType())
+                        .or(() -> Util.getPackageName(element.getEnclosingElement().asType()));
+                return new ExtraVisitor.Context(pkg, imports, extra);
             }).orElseGet(() -> new Context(Optional.empty(), Collections.emptyMap(), extra));
         }
         

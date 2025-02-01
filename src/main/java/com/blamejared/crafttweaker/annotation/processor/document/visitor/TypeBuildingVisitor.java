@@ -11,6 +11,7 @@ import com.blamejared.crafttweaker.annotation.processor.util.ZenCodeKeywordUtil;
 import io.toolisticon.aptk.tools.TypeMirrorWrapper;
 import io.toolisticon.aptk.tools.TypeUtils;
 import io.toolisticon.aptk.tools.wrapper.ElementWrapper;
+import io.toolisticon.aptk.tools.wrapper.TypeElementWrapper;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -115,12 +116,16 @@ public class TypeBuildingVisitor extends SimpleTypeVisitor8<Optional<Type>, Type
                     .map(NameVisitor.INSTANCE::visit)
                     .collect(Collectors.joining(", ", "<", ">"));
         }
-        String packageName = TypeMirrorWrapper.getPackage(t);
-        String className = TypeMirrorWrapper.getSimpleName(t);
+        
+        Optional<String> packageName = Util.getPackageName(t);
+        Optional<String> className = Util.getSimpleName(t);
         Map<String, Type> typeParameters = collectTypeParameters(t, context);
         Optional<Type> superType = getSuperType(t.asElement(), context);
         List<Type> interfaces = collectInterfaces(t.asElement(), context);
-        return Optional.of(new JavaType(key, displayName, nullable, packageName, className, typeParameters, superType, interfaces));
+        if(!packageName.isPresent() || !className.isPresent()) {
+            return Optional.empty();
+        }
+        return Optional.of(new JavaType(key, displayName, nullable, packageName.get(), className.get(), typeParameters, superType, interfaces));
     }
     
     @Override

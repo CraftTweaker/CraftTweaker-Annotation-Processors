@@ -42,6 +42,7 @@ import com.blamejared.crafttweaker.annotation.processor.document.javadoc.element
 import com.blamejared.crafttweaker.annotation.processor.document.javadoc.element.inline.JavadocValueTag;
 import com.blamejared.crafttweaker.annotation.processor.document.javadoc.element.visitor.JavadocElementVisitor;
 import com.blamejared.crafttweaker.annotation.processor.util.Tools;
+import com.blamejared.crafttweaker.annotation.processor.util.Util;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 import io.toolisticon.aptk.common.ToolingProvider;
@@ -333,12 +334,9 @@ public class JavadocCommentsVisitor implements JavadocElementVisitor<Optional<Co
                             .toString());
                 }
                 
-                
-                String pkg = TypeMirrorWrapper.getPackage(element.asType());
-                if(pkg == null) {
-                    pkg = TypeMirrorWrapper.getPackage(element.getEnclosingElement().asType());
-                }
-                return Optional.of(new Context(pkg, imports));
+                Optional<String> pkg = Util.getPackageName(element.asType())
+                        .or(() -> Util.getPackageName(element.getEnclosingElement().asType()));
+                return pkg.map(s -> new Context(s, imports));
             }
             return Optional.empty();
         }

@@ -8,7 +8,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import io.toolisticon.aptk.tools.ElementUtils;
+import io.toolisticon.aptk.tools.TypeMirrorWrapper;
 import io.toolisticon.aptk.tools.TypeUtils;
+import io.toolisticon.aptk.tools.wrapper.TypeElementWrapper;
 import org.openzen.zencode.java.CasterWrapper;
 import org.openzen.zencode.java.ConstructorWrapper;
 import org.openzen.zencode.java.FieldWrapper;
@@ -25,9 +27,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -323,6 +324,49 @@ public class Util {
             
         }
         return result;
+    }
+    
+    public static Optional<String> getPackageName(DeclaredType type) {
+        
+        Optional<String> packageName = getPackageName((TypeMirror) type);
+        if(packageName.isPresent()) {
+            return packageName;
+        }
+        return Optional.ofNullable(TypeElementWrapper.wrap(type.asElement()).getPackageName());
+    }
+    
+    
+    public static Optional<String> getSimpleName(DeclaredType type) {
+        
+        Optional<String> simpleName = getSimpleName((TypeMirror) type);
+        if(simpleName.isPresent()) {
+            return simpleName;
+        }
+        return Optional.ofNullable(TypeElementWrapper.wrap(type.asElement()).getSimpleName());
+    }
+    
+    public static Optional<String> getPackageName(TypeMirror mirror) {
+        
+        String packageName = TypeMirrorWrapper.getPackage(mirror);
+        if(packageName == null) {
+            Optional<TypeElementWrapper> typeElement = TypeMirrorWrapper.getTypeElement(mirror);
+            if(typeElement.isPresent()) {
+                packageName = typeElement.get().getPackageName();
+            }
+        }
+        return Optional.ofNullable(packageName);
+    }
+    
+    public static Optional<String> getSimpleName(TypeMirror mirror) {
+        
+        String simpleName = TypeMirrorWrapper.getSimpleName(mirror);
+        if(simpleName == null) {
+            Optional<TypeElementWrapper> typeElement = TypeMirrorWrapper.getTypeElement(mirror);
+            if(typeElement.isPresent()) {
+                simpleName = typeElement.get().getSimpleName();
+            }
+        }
+        return Optional.ofNullable(simpleName);
     }
     
 }
