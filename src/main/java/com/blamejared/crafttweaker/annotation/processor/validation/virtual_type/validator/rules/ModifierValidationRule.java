@@ -27,7 +27,6 @@ public class ModifierValidationRule implements VirtualTypeValidationRule {
         set.add(ZenCodeType.Getter.class);
         set.add(ZenCodeType.Setter.class);
         set.add(ZenCodeType.Caster.class);
-        set.add(ZenCodeType.Constructor.class);
     });
     
     @Override
